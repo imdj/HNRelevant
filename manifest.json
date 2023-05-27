@@ -18,9 +18,9 @@
     {
       "matches": ["https://news.ycombinator.com/item*"],
       "js": [
-        "utils.js",
-        "dom.js",
-        "main.js"
+        "./scripts/utils.js",
+        "./scripts/dom.js",
+        "./scripts/main.js"
       ]
     }
   ]
