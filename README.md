@@ -3,6 +3,11 @@
 # HNRelevant
 Chrome extension that list relevant submissions to the one you're viewing on Hacker News. The results are embedded into the page as a sidebar.
 
+### Features
+- Embedded into the page
+- Native look and feel
+- Can easily fine-tune the query if the results are not relevant enough
+
 ### How it works
 It's based on [HN algolia search API](https://hn.algolia.com/api) and uses the title as a query
 
