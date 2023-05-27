@@ -9,7 +9,9 @@ function displayResult(object) {
   link.style.display = 'block';
 
   element.appendChild(link);
-  element.insertAdjacentHTML('beforeend',
+  const description = document.createElement('span');
+  description.className = 'subtext';
+  description.insertAdjacentHTML('beforeend',
       object.points + ' points '
       + 'by '
       + `<a href=${'user?id=' + object.author}>${object.author}</a>`
@@ -17,7 +19,8 @@ function displayResult(object) {
       + timestampToRelativeTime(object.created_at)
       + ' | '
       + `<a href=${'item?id=' + object.objectID}>${object.num_comments} comments</a>`
-  )
+  );
+  element.appendChild(description);
 
   return element;
 }

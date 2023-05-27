@@ -15,6 +15,7 @@ const sidebar = document.createElement('td');
 sidebar.style.minWidth = '250px';
 sidebar.style.width = '25%';
 sidebar.style.verticalAlign = 'baseline';
+sidebar.style.marginLeft = '20px';
 
 let query = HN_SubmissionTitle;
 const sidebarHeading = document.createElement('h2');
