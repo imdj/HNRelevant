@@ -17,7 +17,11 @@
   "content_scripts": [
     {
       "matches": ["https://news.ycombinator.com/item*"],
-      "js": ["main.js"]
+      "js": [
+        "utils.js",
+        "dom.js",
+        "main.js"
+      ]
     }
   ]
 }
