@@ -7,8 +7,10 @@
 // @icon         https://raw.githubusercontent.com/imdj/HNRelevant/main/icon.png
 // @run-at       document-start
 // @grant        none
+// @inject-into content
 // ==/UserScript==
 
+window.addEventListener('load', function() {
 (function () {
     'use strict';
 
@@ -181,3 +183,5 @@
     HN_Content.appendChild(sidebar);
 
 })();
+}, false);
+
