@@ -1,4 +1,4 @@
-<img src="preview.png" style="width: 100%"  alt="preview of the relevant submissions section on hacker news"/>
+<div><img src="./preview.gif" style="min-width: 100%"  width="100%" height="100%" alt="preview of the relevant submissions section on hacker news"/></div>
 
 # HNRelevant
 Chrome extension that shows related submissions to the one you're viewing on Hacker News. The results are generated on page load and displayed in a sidebar that's embedded into the page.
