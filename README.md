@@ -1,15 +1,15 @@
 <img src="preview.png" style="width: 100%"  alt="preview of the relevant submissions section on hacker news"/>
 
 # HNRelevant
-Chrome extension that list relevant submissions to the one you're viewing on Hacker News. The results are embedded into the page as a sidebar.
+Chrome extension that shows related submissions to the one you're viewing on Hacker News. The results are generated on page load and displayed in a sidebar that's embedded into the page.
 
 ### Features
-- Embedded into the page
-- Native look and feel
-- Can easily fine-tune the query if the results are not relevant enough
+- **Seamless and easy to use:** Generated automatically and embedded directly into the page
+- **Native look and feel:** Well integrated with the page structure of Hacker News and use global CSS rules like the rest of the site.
+- **Fine-tunable query:** If the initial results are not relevant enough (because the submission title is not optimized), you can easily submit a custom query for better results.
 
 ### How it works
-It's based on [HN algolia search API](https://hn.algolia.com/api) and uses the title as a query
+It's based on [HN algolia search API](https://hn.algolia.com/api) and uses the submission title as its initial query
 
 ### How to install
 1. Clone the repo
