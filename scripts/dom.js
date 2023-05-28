@@ -24,7 +24,15 @@ const sidebarResults = document.createElement('p')
 
 /* Sidebar options */
 const sidebarOptionsContainer = document.createElement('div');
-const submitCustomizationButton = document.createElement('button');
+const queryCustomizationContainer = document.createElement('details');
+queryCustomizationContainer.style.margin = '8px 0';
+queryCustomizationContainer.insertAdjacentHTML('beforeend',
+    `<summary>
+    Customize query
+  </summary>`);
+
+const submitCustomizationButton = document.createElement('input');
+submitCustomizationButton.type = 'submit';
 submitCustomizationButton.id = 'submitCustomization';
 submitCustomizationButton.textContent = 'Submit';
 submitCustomizationButton.style.marginLeft = '5px';
@@ -32,20 +40,21 @@ submitCustomizationButton.onclick = () => {
     query = document.getElementById('queryCustomization').value;
     updateSidebarResults();
 };
-const queryCustomizationLabel = document.createElement('label');
-queryCustomizationLabel.for = 'queryCustomization';
-queryCustomizationLabel.textContent = 'Change query';
 const queryCustomizationInput = document.createElement('input');
 queryCustomizationInput.id = 'queryCustomization';
+queryCustomizationInput.style.margin = '5px 0';
 queryCustomizationInput.placeholder = 'Customize: ' + HN_SubmissionTitle;
-queryCustomizationInput.style.margin = '8px 0';
 queryCustomizationInput.value = HN_SubmissionTitle;
 
-sidebarOptionsContainer.appendChild(queryCustomizationLabel);
-sidebarOptionsContainer.insertAdjacentHTML('beforeend', '<div>');
-sidebarOptionsContainer.appendChild(queryCustomizationInput);
-sidebarOptionsContainer.appendChild(submitCustomizationButton);
-sidebarOptionsContainer.insertAdjacentHTML('beforeend', '</div>');
+// Allow user to submit query by pressing enter
+queryCustomizationInput.addEventListener('keydown', function(event) {
+    if (event.code === 'Enter' && queryCustomizationInput === document.activeElement) {
+        submitCustomizationButton.click();
+    }
+});
+queryCustomizationContainer.appendChild(queryCustomizationInput);
+queryCustomizationContainer.appendChild(submitCustomizationButton);
+sidebarOptionsContainer.appendChild(queryCustomizationContainer);
 
 const numberOfResultsLabel = document.createElement('label');
 numberOfResultsLabel.for = 'numOfResultsDropdown';
@@ -57,7 +66,5 @@ numOfResultsDropdown.id = 'numOfResultsDropdown';
     numOfResultsDropdown.add(new Option(num));
 });
 
-sidebarOptionsContainer.insertAdjacentHTML('beforeend', '<div>');
 sidebarOptionsContainer.appendChild(numberOfResultsLabel);
 sidebarOptionsContainer.appendChild(numOfResultsDropdown);
-sidebarOptionsContainer.insertAdjacentHTML('beforeend', '</div>');
