@@ -24,25 +24,40 @@ const sidebarResults = document.createElement('p')
 
 /* Sidebar options */
 const sidebarOptionsContainer = document.createElement('div');
-const queryCustomization = document.createElement('button');
-queryCustomization.id = 'submitCustomization';
-queryCustomization.textContent = 'Submit';
-queryCustomization.style.marginLeft = '5px';
-queryCustomization.onclick = () => {
+const submitCustomizationButton = document.createElement('button');
+submitCustomizationButton.id = 'submitCustomization';
+submitCustomizationButton.textContent = 'Submit';
+submitCustomizationButton.style.marginLeft = '5px';
+submitCustomizationButton.onclick = () => {
     query = document.getElementById('queryCustomization').value;
     updateSidebarResults();
 };
-sidebarOptionsContainer.insertAdjacentHTML('beforeend',
-    `<input type="text" id="queryCustomization" placeholder="${HN_SubmissionTitle}" style="margin: 8px 0;"/>`
-);
-sidebarOptionsContainer.appendChild(queryCustomization);
+const queryCustomizationLabel = document.createElement('label');
+queryCustomizationLabel.for = 'queryCustomization';
+queryCustomizationLabel.textContent = 'Change query';
+const queryCustomizationInput = document.createElement('input');
+queryCustomizationInput.id = 'queryCustomization';
+queryCustomizationInput.placeholder = 'Customize: ' + HN_SubmissionTitle;
+queryCustomizationInput.style.margin = '8px 0';
+queryCustomizationInput.value = HN_SubmissionTitle;
 
+sidebarOptionsContainer.appendChild(queryCustomizationLabel);
+sidebarOptionsContainer.insertAdjacentHTML('beforeend', '<div>');
+sidebarOptionsContainer.appendChild(queryCustomizationInput);
+sidebarOptionsContainer.appendChild(submitCustomizationButton);
+sidebarOptionsContainer.insertAdjacentHTML('beforeend', '</div>');
+
+const numberOfResultsLabel = document.createElement('label');
+numberOfResultsLabel.for = 'numOfResultsDropdown';
+numberOfResultsLabel.textContent = 'Num of results';
 const numOfResultsDropdown = document.createElement('select');
+numOfResultsDropdown.style.marginLeft = '5px';
 numOfResultsDropdown.id = 'numOfResultsDropdown';
 ['5', '10', '15', '20', '30'].forEach(num => {
     numOfResultsDropdown.add(new Option(num));
 });
 
-sidebarOptionsContainer.insertAdjacentHTML('beforeend', `<div>Num of results: `);
+sidebarOptionsContainer.insertAdjacentHTML('beforeend', '<div>');
+sidebarOptionsContainer.appendChild(numberOfResultsLabel);
 sidebarOptionsContainer.appendChild(numOfResultsDropdown);
-sidebarOptionsContainer.insertAdjacentHTML('beforeend', `</div>`);
+sidebarOptionsContainer.insertAdjacentHTML('beforeend', '</div>');
