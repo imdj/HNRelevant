@@ -1,7 +1,7 @@
 <div><img src="./preview.gif" style="min-width: 100%"  width="100%" height="100%" alt="preview of the relevant submissions section on hacker news"/></div>
 
 # HNRelevant
-Chrome extension that shows related submissions to the one you're viewing on Hacker News. The results are generated on page load and displayed in a sidebar that's embedded into the page.
+A browser extension that shows related submissions to the one you're viewing on Hacker News. The results are generated on page load and displayed in a sidebar that's embedded into the page.
 
 ### Features
 - **Seamless and easy to use:** Generated automatically and embedded directly into the page
@@ -12,10 +12,17 @@ Chrome extension that shows related submissions to the one you're viewing on Hac
 It's based on [HN algolia search API](https://hn.algolia.com/api) and uses the submission title as its initial query
 
 ### How to install
+#### Google Chrome:
 1. Clone the repo
 2. Open Chrome and go to `chrome://extensions/`
 3. Enable `Developer mode`
 4. Click on `Load unpacked extension...` and select the repo folder
+
+#### Userscript:
+You can run it on other browsers using a userscript extensions like: Tampermonkey, Violentmonkey, or Greasemonkey.
+1. Make sure to have one of the userscripts extensions installed
+2. Save the userscript file from [here](https://github.com/imdj/HNRelevant/raw/main/HNRelevant.user.js).
+3. Load the script into the extension of your choice.
 
 ### License
 Released under the [MIT License](http://www.opensource.org/licenses/MIT). See [LICENSE](LICENSE) file for details.
