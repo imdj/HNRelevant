@@ -166,7 +166,7 @@ window.addEventListener('load', function() {
     }
 
 // Run on page load
-    window.onload = () => updateSidebarResults();
+    updateSidebarResults();
 
 // Run on dropdown change (changing num of results: 5, 10, 15, 20, 30)
     numOfResultsDropdown.addEventListener('change', () =>
