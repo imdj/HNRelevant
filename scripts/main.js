@@ -25,6 +25,3 @@ if(document.readyState !== 'complete') {
 numOfResultsDropdown.addEventListener('change', () =>
     updateSidebarResults()
 );
-document.getElementById('submitCustomization')?.addEventListener('click', () => {
-    updateSidebarResults();
-});
