@@ -172,9 +172,6 @@ window.addEventListener('load', function() {
     numOfResultsDropdown.addEventListener('change', () =>
         updateSidebarResults()
     );
-    document.getElementById('submitCustomization')?.addEventListener('click', () => {
-        updateSidebarResults();
-    });
 
 // Append elements
     sidebar.appendChild(sidebarHeading);
