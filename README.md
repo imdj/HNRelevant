@@ -19,6 +19,9 @@ It's based on [HN algolia search API](https://hn.algolia.com/api) and uses the s
 4. Enable `Developer mode`
 5. Click on `Load unpacked extension...` and select the repo folder
 
+#### Firefox: 
+Waiting for the approval by Mozilla to be available as an add-on. Will update this section once it's available.
+
 #### Userscript:
 You can run it on other browsers using a userscript extensions like: Tampermonkey, Violentmonkey, or Greasemonkey.
 1. Make sure to have one of the userscripts extensions installed
