@@ -26,10 +26,9 @@ const sidebarResults = document.createElement('p')
 const sidebarOptionsContainer = document.createElement('div');
 const queryCustomizationContainer = document.createElement('details');
 queryCustomizationContainer.style.margin = '8px 0';
-queryCustomizationContainer.insertAdjacentHTML('beforeend',
-    `<summary>
-    Customize query
-  </summary>`);
+const queryCustomizationSummary = document.createElement('summary');
+queryCustomizationSummary.textContent = 'Customize query';
+queryCustomizationContainer.appendChild(queryCustomizationSummary);
 
 const submitCustomizationButton = document.createElement('input');
 submitCustomizationButton.type = 'submit';
