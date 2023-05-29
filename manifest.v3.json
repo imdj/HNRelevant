@@ -2,11 +2,11 @@
   "manifest_version": 3,
   "name": "HNRelevant",
   "description": "Shows relevant submissions on Hacker News",
-  "version": "0.1",
+  "version": "0.1.3",
   "icons": {
-    "16" : "/assets/images/icon-16.png",
-    "48" : "/assets/images/icon-48.png",
-    "128" : "/assets/images/icon-128.png"
+    "16": "/assets/images/icon-16.png",
+    "48": "/assets/images/icon-48.png",
+    "128": "/assets/images/icon-128.png"
   },
   "permissions": [
     "activeTab"
@@ -16,7 +16,9 @@
   ],
   "content_scripts": [
     {
-      "matches": ["https://news.ycombinator.com/item*"],
+      "matches": [
+        "https://news.ycombinator.com/item*"
+      ],
       "js": [
         "./scripts/utils.js",
         "./scripts/dom.js",

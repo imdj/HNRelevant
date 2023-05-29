@@ -14,9 +14,10 @@ It's based on [HN algolia search API](https://hn.algolia.com/api) and uses the s
 ### How to install
 #### Google Chrome:
 1. Clone the repo
-2. Open Chrome and go to `chrome://extensions/`
-3. Enable `Developer mode`
-4. Click on `Load unpacked extension...` and select the repo folder
+2. Rename `manifest.v3.json` to `manifest.json` (For older versions of Chrome, use `manifest.v2.json` instead)
+3. Open Chrome and go to `chrome://extensions/`
+4. Enable `Developer mode`
+5. Click on `Load unpacked extension...` and select the repo folder
 
 #### Userscript:
 You can run it on other browsers using a userscript extensions like: Tampermonkey, Violentmonkey, or Greasemonkey.

@@ -8,8 +8,18 @@ async function searchHackerNews(query, numResults) {
     return await fetch(url).then(res => res.json());
 }
 
-// Run on page load
-window.onload = () => updateSidebarResults();
+// Append elements
+sidebar.appendChild(sidebarHeading);
+sidebar.appendChild(sidebarOptionsContainer);
+sidebar.appendChild(sidebarResults);
+HN_Content.appendChild(sidebar);
+
+// Make sure to run this after the page has loaded
+if(document.readyState !== 'complete') {
+    window.addEventListener('load',updateSidebarResults);
+} else {
+    updateSidebarResults();
+}
 
 // Run on dropdown change (changing num of results: 5, 10, 15, 20, 30)
 numOfResultsDropdown.addEventListener('change', () =>
@@ -18,9 +28,3 @@ numOfResultsDropdown.addEventListener('change', () =>
 document.getElementById('submitCustomization')?.addEventListener('click', () => {
     updateSidebarResults();
 });
-
-// Append elements
-sidebar.appendChild(sidebarHeading);
-sidebar.appendChild(sidebarOptionsContainer);
-sidebar.appendChild(sidebarResults);
-HN_Content.appendChild(sidebar);
