@@ -16,7 +16,7 @@ It's based on [HN algolia search API](https://hn.algolia.com/api) and uses the s
 Available on Chrome web store: [HNRelevant](https://chrome.google.com/webstore/detail/hnrelevant/iajhnkeiioebplnbfkpnlnggkgblmoln)
 
 #### Firefox: 
-Waiting for the approval by Mozilla to be available as an add-on. Will update this section once it's available.
+Firefox add-on: [HNRelevant](https://addons.mozilla.org/en-US/firefox/addon/hnrelevant/)
 
 #### Userscript:
 You can run it on other browsers using a userscript extensions like: Tampermonkey, Violentmonkey, or Greasemonkey.
