@@ -13,11 +13,7 @@ It's based on [HN algolia search API](https://hn.algolia.com/api) and uses the s
 
 ### How to install
 #### Google Chrome:
-1. Clone the repo
-2. Rename `manifest.v3.json` to `manifest.json` (For older versions of Chrome, use `manifest.v2.json` instead)
-3. Open Chrome and go to `chrome://extensions/`
-4. Enable `Developer mode`
-5. Click on `Load unpacked extension...` and select the repo folder
+Available on Chrome web store: [HNRelevant](https://chrome.google.com/webstore/detail/hnrelevant/iajhnkeiioebplnbfkpnlnggkgblmoln)
 
 #### Firefox: 
 Waiting for the approval by Mozilla to be available as an add-on. Will update this section once it's available.
