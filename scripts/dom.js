@@ -46,7 +46,7 @@ queryCustomizationInput.placeholder = 'Customize: ' + HN_SubmissionTitle;
 queryCustomizationInput.value = HN_SubmissionTitle;
 
 // Allow user to submit query by pressing enter
-queryCustomizationInput.addEventListener('keydown', function(event) {
+queryCustomizationInput.addEventListener('keydown', function (event) {
     if (event.code === 'Enter' && queryCustomizationInput === document.activeElement) {
         submitCustomizationButton.click();
     }
@@ -62,7 +62,7 @@ const numOfResultsDropdown = document.createElement('select');
 numOfResultsDropdown.style.marginLeft = '5px';
 numOfResultsDropdown.id = 'numOfResultsDropdown';
 ['5', '10', '15', '20', '30'].forEach(num => {
-    numOfResultsDropdown.add(new Option(num));
+    numOfResultsDropdown.add(new Option(num, num));
 });
 
 sidebarOptionsContainer.appendChild(numberOfResultsLabel);

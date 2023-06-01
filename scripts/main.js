@@ -14,14 +14,27 @@ sidebar.appendChild(sidebarOptionsContainer);
 sidebar.appendChild(sidebarResults);
 HN_Content.appendChild(sidebar);
 
-// Make sure to run this after the page has loaded
-if(document.readyState !== 'complete') {
-    window.addEventListener('load',updateSidebarResults);
-} else {
-    updateSidebarResults();
-}
+(async () => {
+    // Get preferences from storage
+    // Mode: manual or automatic
+    const mode = await (chrome.storage.sync ? chrome.storage.sync.get('mode') : browser.storage.sync.get('mode'));
+
+    // Number of results: default to 5
+    const numOfResults = await (chrome.storage.sync ? chrome.storage.sync.get('results') : browser.storage.sync.get('results'));
+    numOfResultsDropdown.value = numOfResults ? numOfResults.results : '5';
+
+    // Don't run if mode is set to `manual`
+    if (mode.mode !== 'manual') {
+        // Make sure to run this after the page has loaded
+        if (document.readyState !== 'complete') {
+            window.addEventListener('load', updateSidebarResults);
+        } else {
+            updateSidebarResults();
+        }
+    }
 
 // Run on dropdown change (changing num of results: 5, 10, 15, 20, 30)
-numOfResultsDropdown.addEventListener('change', () =>
-    updateSidebarResults()
-);
+    numOfResultsDropdown.addEventListener('change', () =>
+        updateSidebarResults()
+    );
+})();
