@@ -169,7 +169,7 @@ window.addEventListener('load', function () {
         async function searchHackerNews(query, numResults) {
             const id = (new URLSearchParams(document.location.search)).get("id");
             const url = `https://hn.algolia.com/api/v1/search`
-                + `?similarQuery=${query}`
+                + `?similarQuery=${encodeURIComponent(query)}`
                 + `&tags=story`
                 + `&hitsPerPage=${numResults}` // number of results displayed
                 + `&filters=NOT objectID:` + id; // exclude current submission
