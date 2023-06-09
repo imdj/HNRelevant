@@ -17,6 +17,7 @@
         "https://news.ycombinator.com/item*"
       ],
       "js": [
+        "./scripts/query.js",
         "./scripts/utils.js",
         "./scripts/dom.js",
         "./scripts/main.js"

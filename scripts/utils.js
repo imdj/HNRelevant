@@ -36,7 +36,7 @@ function displayResult(object) {
 // Update sidebar content
 function updateSidebarResults() {
     sidebarResults.innerHTML = '';
-    searchHackerNews(query, numOfResultsDropdown.value)
+    searchHackerNews(optimizeSearchQuery(query), numOfResultsDropdown.value)
         .then(result => {
             const list = document.createElement('ul');
             list.style.padding = 'unset';
