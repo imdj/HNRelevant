@@ -159,7 +159,7 @@ window.addEventListener('load', function () {
         numOfResultsDropdown.style.marginLeft = '5px';
         numOfResultsDropdown.id = 'numOfResultsDropdown';
         ['5', '10', '15', '20', '30'].forEach(num => {
-            numOfResultsDropdown.add(new Option(num));
+            numOfResultsDropdown.add(new Option(num, num));
         });
 
         sidebarOptionsContainer.appendChild(numberOfResultsLabel);
