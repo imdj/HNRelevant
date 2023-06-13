@@ -51,12 +51,33 @@ window.addEventListener('load', function () {
             const element = document.createElement('li');
             element.style.padding = '5px 0';
 
+            const titleContainer = document.createElement('span');
+            titleContainer.style.display = 'block';
+            titleContainer.classList.add('titleline');
             const link = document.createElement('a');
-            link.href = object.url;
+            link.href = object.url ? object.url : 'item?id=' + object.objectID;
             link.textContent = object.title;
-            link.style.display = 'block';
+            link.rel = 'no-referrer';
 
-            element.appendChild(link);
+            titleContainer.appendChild(link);
+
+            if (object.url) {
+                const domainContainer = document.createElement('span');
+                domainContainer.classList.add('sitebit', 'comhead');
+                const domain = document.createElement('a');
+                domain.href = 'from?site=' + (new URL(object.url)).hostname.replace('www.','');
+                const domainChild = document.createElement('span');
+                domainChild.classList.add('sitestr');
+                domainChild.textContent = (new URL(object.url)).hostname.replace('www.','');
+
+                domain.appendChild(domainChild);
+                domainContainer.appendChild(domain);
+                domain.insertAdjacentText('beforebegin', '(');
+                domain.insertAdjacentText('afterend', ')');
+                titleContainer.appendChild(domainContainer);
+            }
+            element.appendChild(titleContainer);
+
             const description = document.createElement('span');
             description.className = 'subtext';
             const author = document.createElement('a');
