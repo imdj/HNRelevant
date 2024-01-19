@@ -1,3 +1,18 @@
+// load preference from storage
+function loadPreference(key, defaultValue) {
+    if (chrome.storage) {
+        return new Promise((resolve, reject) => {
+            chrome.storage.sync.get(key, result => {
+                resolve(result[key] || defaultValue);
+            });
+        });
+    } else { // Firefox
+        return browser.storage.sync.get(key).then(result => {
+            return result[key] || defaultValue;
+        });
+    }
+}
+
 // Render dom element for a search result
 function displayResult(object) {
     const element = document.createElement('li');

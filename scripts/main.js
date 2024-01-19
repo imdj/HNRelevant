@@ -17,11 +17,10 @@ HN_Content.appendChild(sidebar);
 (async () => {
     // Get preferences from storage
     // Mode: manual or automatic
-    const mode = await (chrome.storage.sync ? chrome.storage.sync.get('mode') : browser.storage.sync.get('mode'));
+    const mode = await loadPreference('mode', 'auto');
 
     // Number of results: default to 5
-    const numOfResults = await (chrome.storage.sync ? chrome.storage.sync.get('results') : browser.storage.sync.get('results'));
-    numOfResultsDropdown.value = numOfResults ? numOfResults.results : '5';
+    numOfResultsDropdown.value = await loadPreference('results', 5);
 
     // Don't run if mode is set to `manual`
     if (mode.mode !== 'manual') {
