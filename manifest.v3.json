@@ -4,9 +4,9 @@
   "description": "Shows relevant submissions on Hacker News",
   "version": "0.1.6",
   "icons": {
-    "16": "/assets/images/icon-16.png",
-    "48": "/assets/images/icon-48.png",
-    "128": "/assets/images/icon-128.png"
+    "16": "./assets/images/icon-16.png",
+    "48": "./assets/images/icon-48.png",
+    "128": "./assets/images/icon-128.png"
   },
   "host_permissions": [
     "https://news.ycombinator.com/*"
@@ -29,9 +29,9 @@
   ],
   "action": {
     "default_icon": {
-      "16": "/assets/images/icon-16.png",
-      "48": "/assets/images/icon-48.png",
-      "128": "/assets/images/icon-128.png"
+      "16": "./assets/images/icon-16.png",
+      "48": "./assets/images/icon-48.png",
+      "128": "./assets/images/icon-128.png"
     },
     "default_popup": "./popup.html",
     "default_title": "HNRelevant"
