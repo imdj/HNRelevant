@@ -18,6 +18,14 @@ if ($missingFiles) {
     Exit
 }
 
+# Check if WinRAR is installed
+# Tried using Compress-Archive but the result file wasn't compatible with Firefox
+$winRarPath = "C:\Program Files\WinRAR\WinRAR.exe"  # Replace with the actual path to WinRAR.exe
+if (-not (Test-Path $winRarPath)) {
+    Write-Host "WinRAR is not installed. Exiting..."
+    exit
+}
+
 # Clean output directory if it already exists
 $outputDir = Join-Path $baseDir "output"
 if (Test-Path $outputDir) {
@@ -61,7 +69,9 @@ foreach ($manifest in @("manifest.v2.json", "manifest.v3.json")) {
     # Join paths for each file individually
     $pathsToPackage = $filesToPackage | ForEach-Object { Join-Path $baseDir $_ }
     
-    Compress-Archive -Path $pathsToPackage -DestinationPath $outputPath -CompressionLevel Optimal -Force
+    # Use WinRAR to create the zip file
+    $winRarCommand = "a -afzip -ep1 -r $outputPath $pathsToPackage"
+    Start-Process -FilePath $winRarPath -ArgumentList $winRarCommand -NoNewWindow -Wait
 
     # Delete the temporary manifest
     Remove-Item -Path $tempManifestPath -Force
