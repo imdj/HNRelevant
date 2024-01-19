@@ -23,7 +23,7 @@ HN_Content.appendChild(sidebar);
     numOfResultsDropdown.value = await loadPreference('results', 5);
 
     // Don't run if mode is set to `manual`
-    if (mode.mode !== 'manual') {
+    if (mode !== 'manual') {
         // Make sure to run this after the page has loaded
         if (document.readyState !== 'complete') {
             window.addEventListener('load', updateSidebarResults);
@@ -33,7 +33,9 @@ HN_Content.appendChild(sidebar);
     }
 
 // Run on dropdown change (changing num of results: 5, 10, 15, 20, 30)
-    numOfResultsDropdown.addEventListener('change', () =>
-        updateSidebarResults()
-    );
+    numOfResultsDropdown.addEventListener('change', () => {
+        if (mode !== 'manual') {
+            updateSidebarResults();
+        }
+    });
 })();
