@@ -93,5 +93,52 @@ const numOfResultsDropdown = createElement('select', {
     return new Option(num, num);
 }));
 
+// Set initial value for numOfResultsDropdown
+numOfResultsDropdown.value = 15;
+
+// create date range dropdown
+const dateRangeLabel = createElement('label', {
+    for: 'dateRangeDropdown',
+    style: 'margin-left: 5px;'
+}, [document.createTextNode('Date')]);
+const dateRangeDropdown = createElement('select', {
+    style: 'margin-left: 5px;',
+    id: 'dateRangeDropdown',
+}, [ 'Past week', 'Past month', 'Past year', 'All time', 'Custom'].map(num => {
+    return new Option(num, num);
+}));
+
+// Set initial value for dateRangeDropdown
+dateRangeDropdown.value = 'All time';
+
+// create date range input if custom is selected
+const dateRangeInputContainer = document.createElement('div');
+dateRangeInputContainer.style.display = 'none';
+dateRangeInputContainer.style.margin = '5px 0';
+const startDateInput = createElement('input', {
+    type: 'date',
+    id: 'startDate',
+    style: 'margin-left: 5px;'
+});
+const endDateInput = createElement('input', {
+    type: 'date',
+    id: 'endDate',
+    style: 'margin-left: 5px;'
+});
+dateRangeInputContainer.appendChild(startDateInput);
+dateRangeInputContainer.appendChild(endDateInput);
+
+// handle date range dropdown change
+dateRangeDropdown.addEventListener('change', () => {
+    if (dateRangeDropdown.value === 'Custom') {
+        dateRangeInputContainer.style.display = 'block';
+    } else {
+        dateRangeInputContainer.style.display = 'none';
+    }
+});
+
 sidebarOptionsContainer.appendChild(numberOfResultsLabel);
 sidebarOptionsContainer.appendChild(numOfResultsDropdown);
+sidebarOptionsContainer.appendChild(dateRangeLabel);
+sidebarOptionsContainer.appendChild(dateRangeDropdown);
+sidebarOptionsContainer.appendChild(dateRangeInputContainer);

@@ -82,6 +82,17 @@ foreach ($scriptFile in $scriptFiles) {
         // Run on dropdown change (changing num of results: 5, 10, 15, 20, 30)
         numOfResultsDropdown.addEventListener('change', () =>
            updateSidebarResults());
+    
+        // Run on dropdown change (changing date range: past week, past month, past year, all time)
+        dateRangeDropdown.addEventListener('change', () =>
+            updateSidebarResults());
+    
+        // Run on date range input change
+        startDateInput.addEventListener('change', () =>
+            updateSidebarResults());
+    
+        endDateInput.addEventListener('change', () =>
+            updateSidebarResults());
 "@
 
         $userScriptContent += $mainJsContent

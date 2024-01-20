@@ -72,7 +72,32 @@ function displayResult(object) {
 // Update sidebar content
 function updateSidebarResults() {
     sidebarResults.innerHTML = '';
-    searchHackerNews(optimizeSearchQuery(query), numOfResultsDropdown.value)
+
+    let endDate = new Date().getTime() / 1000;
+    let startDate;
+    switch (dateRangeDropdown.value) {
+        case 'Past week':
+            startDate = endDate - 604800;
+            break;
+        case 'Past month':
+            startDate = endDate - 2592000;
+            break;
+        case 'Past year':
+            startDate = endDate - 31536000;
+            break;
+        case 'Custom':
+            const startDateValue = document.getElementById('startDate').value;
+            const endDateValue = document.getElementById('endDate').value;
+            
+            // if one of the dates is not set, use the default value
+            endDate = endDateValue ? new Date(endDateValue).getTime() / 1000 : endDate;
+            startDate = startDateValue ? new Date(startDateValue).getTime() / 1000 : 0;
+            break;
+        default:
+            startDate = 0;
+    }
+
+    searchHackerNews(optimizeSearchQuery(query), numOfResultsDropdown.value, startDate, endDate)
         .then(result => {
             const list = document.createElement('ul');
             list.style.padding = 'unset';

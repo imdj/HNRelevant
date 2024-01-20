@@ -119,7 +119,32 @@ function displayResult(object) {
 // Update sidebar content
 function updateSidebarResults() {
     sidebarResults.innerHTML = '';
-    searchHackerNews(optimizeSearchQuery(query), numOfResultsDropdown.value)
+
+    let endDate = new Date().getTime() / 1000;
+    let startDate;
+    switch (dateRangeDropdown.value) {
+        case 'Past week':
+            startDate = endDate - 604800;
+            break;
+        case 'Past month':
+            startDate = endDate - 2592000;
+            break;
+        case 'Past year':
+            startDate = endDate - 31536000;
+            break;
+        case 'Custom':
+            const startDateValue = document.getElementById('startDate').value;
+            const endDateValue = document.getElementById('endDate').value;
+            
+            // if one of the dates is not set, use the default value
+            endDate = endDateValue ? new Date(endDateValue).getTime() / 1000 : endDate;
+            startDate = startDateValue ? new Date(startDateValue).getTime() / 1000 : 0;
+            break;
+        default:
+            startDate = 0;
+    }
+
+    searchHackerNews(optimizeSearchQuery(query), numOfResultsDropdown.value, startDate, endDate)
         .then(result => {
             const list = document.createElement('ul');
             list.style.padding = 'unset';
@@ -255,17 +280,66 @@ const numOfResultsDropdown = createElement('select', {
     return new Option(num, num);
 }));
 
+// Set initial value for numOfResultsDropdown
+numOfResultsDropdown.value = 15;
+
+// create date range dropdown
+const dateRangeLabel = createElement('label', {
+    for: 'dateRangeDropdown',
+    style: 'margin-left: 5px;'
+}, [document.createTextNode('Date')]);
+const dateRangeDropdown = createElement('select', {
+    style: 'margin-left: 5px;',
+    id: 'dateRangeDropdown',
+}, [ 'Past week', 'Past month', 'Past year', 'All time', 'Custom'].map(num => {
+    return new Option(num, num);
+}));
+
+// Set initial value for dateRangeDropdown
+dateRangeDropdown.value = 'All time';
+
+// create date range input if custom is selected
+const dateRangeInputContainer = document.createElement('div');
+dateRangeInputContainer.style.display = 'none';
+dateRangeInputContainer.style.margin = '5px 0';
+const startDateInput = createElement('input', {
+    type: 'date',
+    id: 'startDate',
+    style: 'margin-left: 5px;'
+});
+const endDateInput = createElement('input', {
+    type: 'date',
+    id: 'endDate',
+    style: 'margin-left: 5px;'
+});
+dateRangeInputContainer.appendChild(startDateInput);
+dateRangeInputContainer.appendChild(endDateInput);
+
+// handle date range dropdown change
+dateRangeDropdown.addEventListener('change', () => {
+    if (dateRangeDropdown.value === 'Custom') {
+        dateRangeInputContainer.style.display = 'block';
+    } else {
+        dateRangeInputContainer.style.display = 'none';
+    }
+});
+
 sidebarOptionsContainer.appendChild(numberOfResultsLabel);
 sidebarOptionsContainer.appendChild(numOfResultsDropdown);
+sidebarOptionsContainer.appendChild(dateRangeLabel);
+sidebarOptionsContainer.appendChild(dateRangeDropdown);
+sidebarOptionsContainer.appendChild(dateRangeInputContainer);
+
 
 /* main.js */
-async function searchHackerNews(query, numResults) {
+async function searchHackerNews(query, numResults, startDate = 0, endDate = new Date().getTime() / 1000) {
     const id = (new URLSearchParams(document.location.search)).get("id");
     const url = `https://hn.algolia.com/api/v1/search`
         + `?similarQuery=${encodeURIComponent(query)}`
         + `&tags=story`
         + `&hitsPerPage=${numResults}` // number of results displayed
-        + `&filters=NOT objectID:` + id; // exclude current submission
+        + `&filters=NOT objectID:` + id // exclude current submission
+        + `&numericFilters=created_at_i>${startDate},created_at_i<${endDate}` // filter by date
     return await fetch(url).then(res => res.json());
 }
 
@@ -281,5 +355,16 @@ HN_Content.appendChild(sidebar);
         // Run on dropdown change (changing num of results: 5, 10, 15, 20, 30)
         numOfResultsDropdown.addEventListener('change', () =>
            updateSidebarResults());
+    
+        // Run on dropdown change (changing date range: past week, past month, past year, all time)
+        dateRangeDropdown.addEventListener('change', () =>
+            updateSidebarResults());
+    
+        // Run on date range input change
+        startDateInput.addEventListener('change', () =>
+            updateSidebarResults());
+    
+        endDateInput.addEventListener('change', () =>
+            updateSidebarResults());
 })();
 });
