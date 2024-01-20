@@ -15,10 +15,23 @@ function createElement(tag, attributes, children) {
 
 /* HN DOM elements */
 const HN_Main = document.querySelector('#hnmain > tbody');
-const HN_navbar = HN_Main.children[0];
+let NavbarIndex = 0;
+const rows = HN_Main.querySelectorAll("tr");
+
+// handle special case if death banner is present
+for (const row of rows) {
+    NavbarIndex++;
+    if (row.querySelector('td img[src="s.gif"]')) {
+        row.querySelector("td").setAttribute("colspan", "100%");
+        break;
+    }
+}
+
+const HN_navbar = HN_Main.children[NavbarIndex];
+
 // Since we add a new column to the table for the sidebar, we need to make navbar span the complete row (all columns)
 HN_navbar.children[0].setAttribute('colspan', '100%');
-const HN_Content = HN_Main.children[2];
+const HN_Content = HN_Main.children[NavbarIndex + 2];
 const HN_SubmissionTitle = HN_Content.children[0].querySelector('.titleline>a').textContent;
 // Make sure all table data elements are aligned to the top
 // (they're centered vertically by default which causes problem when coupled with long sidebar)
