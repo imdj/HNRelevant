@@ -19,12 +19,9 @@ let NavbarIndex = 0;
 const rows = HN_Main.querySelectorAll("tr");
 
 // handle special case if death banner is present
-for (const row of rows) {
-    NavbarIndex++;
-    if (row.querySelector('td img[src="s.gif"]')) {
-        row.querySelector("td").setAttribute("colspan", "100%");
-        break;
-    }
+if (rows[0].querySelector('td img[src="s.gif"]')) {
+    rows[0].querySelector("td").setAttribute("colspan", "100%");
+    NavbarIndex = 1;
 }
 
 const HN_navbar = HN_Main.children[NavbarIndex];
