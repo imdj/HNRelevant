@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         HNRelevant
-// @version      0.1.7
+// @version      0.1.8
 // @description  Shows relevant submissions on Hacker News
 // @author       imdj
 // @match        https://news.ycombinator.com/item*
