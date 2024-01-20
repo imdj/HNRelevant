@@ -1,3 +1,18 @@
+function createElement(tag, attributes, children) {
+    const element = document.createElement(tag);
+    if (attributes) {
+        for (const [key, value] of Object.entries(attributes)) {
+            element.setAttribute(key, value);
+        }
+    }
+    if (children) {
+        for (const child of children) {
+            element.appendChild(child);
+        }
+    }
+    return element;
+}
+
 /* HN DOM elements */
 const HN_Main = document.querySelector('#hnmain > tbody');
 const HN_navbar = HN_Main.children[0];
@@ -11,15 +26,12 @@ const HN_TableData = HN_Main.querySelectorAll('td');
 HN_TableData.forEach(td => td.style.verticalAlign = 'baseline');
 
 /* Sidebar */
-const sidebar = document.createElement('td');
-sidebar.style.minWidth = '250px';
-sidebar.style.width = '25%';
-sidebar.style.verticalAlign = 'baseline';
-sidebar.style.marginLeft = '20px';
+const sidebar = createElement('td', {
+    style: 'min-width: 250px; width: 25%; vertical-align: baseline; margin-left: 20px;'
+});
 
 let query = HN_SubmissionTitle;
-const sidebarHeading = document.createElement('h2');
-sidebarHeading.textContent = 'Relevant Submissions';
+const sidebarHeading = createElement('h2', {}, [document.createTextNode('Relevant Submissions')]);
 const sidebarResults = document.createElement('p')
 
 /* Sidebar options */
@@ -30,20 +42,23 @@ const queryCustomizationSummary = document.createElement('summary');
 queryCustomizationSummary.textContent = 'Customize query';
 queryCustomizationContainer.appendChild(queryCustomizationSummary);
 
-const submitCustomizationButton = document.createElement('input');
-submitCustomizationButton.type = 'submit';
-submitCustomizationButton.id = 'submitCustomization';
-submitCustomizationButton.textContent = 'Submit';
-submitCustomizationButton.style.marginLeft = '5px';
+const submitCustomizationButton = createElement('button', {
+    type: 'submit',
+    id: 'submitCustomization',
+    style: 'margin-left: 5px;'
+}, [document.createTextNode('Submit')]);
+
 submitCustomizationButton.onclick = () => {
     query = document.getElementById('queryCustomization').value;
     updateSidebarResults();
 };
-const queryCustomizationInput = document.createElement('input');
-queryCustomizationInput.id = 'queryCustomization';
-queryCustomizationInput.style.margin = '5px 0';
-queryCustomizationInput.placeholder = 'Customize: ' + HN_SubmissionTitle;
-queryCustomizationInput.value = HN_SubmissionTitle;
+
+const queryCustomizationInput = createElement('input', {
+    id: 'queryCustomization',
+    style: 'margin: 5px 0;',
+    placeholder: 'Customize: ' + HN_SubmissionTitle,
+    value: HN_SubmissionTitle
+});
 
 // Allow user to submit query by pressing enter
 queryCustomizationInput.addEventListener('keydown', function (event) {
@@ -55,15 +70,15 @@ queryCustomizationContainer.appendChild(queryCustomizationInput);
 queryCustomizationContainer.appendChild(submitCustomizationButton);
 sidebarOptionsContainer.appendChild(queryCustomizationContainer);
 
-const numberOfResultsLabel = document.createElement('label');
-numberOfResultsLabel.for = 'numOfResultsDropdown';
-numberOfResultsLabel.textContent = 'Num of results';
-const numOfResultsDropdown = document.createElement('select');
-numOfResultsDropdown.style.marginLeft = '5px';
-numOfResultsDropdown.id = 'numOfResultsDropdown';
-['5', '10', '15', '20', '30'].forEach(num => {
-    numOfResultsDropdown.add(new Option(num, num));
-});
+const numberOfResultsLabel = createElement('label', {
+    for: 'numOfResultsDropdown'
+}, [document.createTextNode('Num of results')]);
+const numOfResultsDropdown = createElement('select', {
+    style: 'margin-left: 5px;',
+    id: 'numOfResultsDropdown'
+}, ['5', '10', '15', '20', '30'].map(num => {
+    return new Option(num, num);
+}));
 
 sidebarOptionsContainer.appendChild(numberOfResultsLabel);
 sidebarOptionsContainer.appendChild(numOfResultsDropdown);
