@@ -20,14 +20,14 @@ const rows = HN_Main.querySelectorAll("tr");
 
 // handle special case if death banner is present
 if (rows[0].querySelector('td img[src="s.gif"]')) {
-    rows[0].querySelector("td").setAttribute("colspan", "100%");
+    rows[0].querySelector("td").setAttribute("colspan", "2");
     NavbarIndex = 1;
 }
 
 const HN_navbar = HN_Main.children[NavbarIndex];
 
 // Since we add a new column to the table for the sidebar, we need to make navbar span the complete row (all columns)
-HN_navbar.children[0].setAttribute('colspan', '100%');
+HN_navbar.children[0].setAttribute('colspan', '2');
 const HN_Content = HN_Main.children[NavbarIndex + 2];
 const HN_SubmissionTitle = HN_Content.children[0].querySelector('.titleline>a').textContent;
 // Make sure all table data elements are aligned to the top
