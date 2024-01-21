@@ -233,11 +233,15 @@ const sidebarResults = document.createElement('p')
 
 /* Sidebar options */
 const sidebarOptionsContainer = document.createElement('div');
-const queryCustomizationContainer = document.createElement('details');
-queryCustomizationContainer.style.margin = '8px 0';
+const queryCustomizationDetails = document.createElement('details');
+queryCustomizationDetails.style.margin = '8px 0';
 const queryCustomizationSummary = document.createElement('summary');
 queryCustomizationSummary.textContent = 'Customize query';
-queryCustomizationContainer.appendChild(queryCustomizationSummary);
+queryCustomizationDetails.appendChild(queryCustomizationSummary);
+
+const queryCustomizationContainer = createElement('div', {
+    style: 'display: flex; flex-direction: row; align-items: center; padding-right: 10px;'
+});
 
 const submitCustomizationButton = createElement('button', {
     type: 'submit',
@@ -252,10 +256,11 @@ submitCustomizationButton.onclick = () => {
 
 const queryCustomizationInput = createElement('input', {
     id: 'queryCustomization',
-    style: 'margin: 5px 0;',
+    style: 'margin: 5px 0; flex-grow: 1;',
     placeholder: 'Customize: ' + HN_SubmissionTitle,
     value: HN_SubmissionTitle
 });
+
 
 // Allow user to submit query by pressing enter
 queryCustomizationInput.addEventListener('keydown', function (event) {
@@ -263,9 +268,11 @@ queryCustomizationInput.addEventListener('keydown', function (event) {
         submitCustomizationButton.click();
     }
 });
+
 queryCustomizationContainer.appendChild(queryCustomizationInput);
 queryCustomizationContainer.appendChild(submitCustomizationButton);
-sidebarOptionsContainer.appendChild(queryCustomizationContainer);
+queryCustomizationDetails.appendChild(queryCustomizationContainer);
+sidebarOptionsContainer.appendChild(queryCustomizationDetails);
 
 const numberOfResultsLabel = createElement('label', {
     for: 'numOfResultsDropdown'
