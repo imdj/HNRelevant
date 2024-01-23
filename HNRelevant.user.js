@@ -120,6 +120,11 @@ function displayResult(object) {
 function updateSidebarResults() {
     sidebarResults.innerHTML = '';
 
+    // Get search type
+    const searchType = document.querySelector('input[name="searchType"]:checked')
+        ? document.querySelector('input[name="searchType"]:checked').value
+        : 'similar';
+
     let endDate = new Date().getTime() / 1000;
     let startDate;
     switch (dateRangeDropdown.value) {
@@ -144,11 +149,19 @@ function updateSidebarResults() {
             startDate = 0;
     }
 
-    searchHackerNews(optimizeSearchQuery(query), numOfResultsDropdown.value, startDate, endDate)
+    searchHackerNews(searchType, query, numOfResultsDropdown.value, startDate, endDate)
         .then(result => {
             const list = document.createElement('ul');
             list.style.padding = 'unset';
             list.style.listStyle = 'none';
+
+            // if no results, display a message
+            if (result.hits.length === 0) {
+                const element = document.createElement('li');
+                element.style = 'padding: 5px 0; text-align: center; white-space: pre-line;';
+                element.textContent = searchType === 'verbatim' ? 'No matching results found.\r\nTry a different query or switch to \'Similar\' search.' : 'No results found. Try to customize the query.';
+                list.appendChild(element);
+            }
             result.hits.forEach(hit => {
                 const element = displayResult(hit);
                 list.appendChild(element);
@@ -328,18 +341,50 @@ dateRangeDropdown.addEventListener('change', () => {
     }
 });
 
+// search type radio buttons
+const searchTypeContainer = document.createElement('div');
+
+const searchTypeLabel = createElement('label', {
+    for: 'searchType',
+    style: 'margin-left: 5px;'
+}, [document.createTextNode('Search type')]);
+const verbatimSearch = createElement('input', {
+    type: 'radio',
+    name: 'searchType',
+    value: 'verbatim',
+    style: 'margin-left: 5px;'
+});
+const similarSearch = createElement('input', {
+    type: 'radio',
+    name: 'searchType',
+    value: 'similar',
+    checked: true,
+    style: 'margin-left: 5px;'
+});
+
+searchTypeContainer.appendChild(searchTypeLabel);
+searchTypeContainer.appendChild(verbatimSearch);
+searchTypeContainer.appendChild(document.createTextNode('Verbatim'));
+searchTypeContainer.appendChild(similarSearch);
+searchTypeContainer.appendChild(document.createTextNode('Similar'));
+
+
 sidebarOptionsContainer.appendChild(numberOfResultsLabel);
 sidebarOptionsContainer.appendChild(numOfResultsDropdown);
 sidebarOptionsContainer.appendChild(dateRangeLabel);
 sidebarOptionsContainer.appendChild(dateRangeDropdown);
 sidebarOptionsContainer.appendChild(dateRangeInputContainer);
+sidebarOptionsContainer.appendChild(searchTypeContainer);
 
 
 /* main.js */
-async function searchHackerNews(query, numResults, startDate = 0, endDate = new Date().getTime() / 1000) {
+async function searchHackerNews(type, query, numResults, startDate = 0, endDate = new Date().getTime() / 1000) {
+    query = type === 'verbatim' ? query : optimizeSearchQuery(query);
+
     const id = (new URLSearchParams(document.location.search)).get("id");
     const url = `https://hn.algolia.com/api/v1/search`
-        + `?similarQuery=${encodeURIComponent(query)}`
+        + (type === 'verbatim' ? `?query=` : `?similarQuery=`)
+        + `${encodeURIComponent(query)}`
         + `&tags=story`
         + `&hitsPerPage=${numResults}` // number of results displayed
         + `&filters=NOT objectID:` + id // exclude current submission
@@ -370,5 +415,11 @@ HN_Content.appendChild(sidebar);
     
         endDateInput.addEventListener('change', () =>
             updateSidebarResults());
+
+        // Run on change of search type (verbatim or similar)
+        document.querySelectorAll('input[name="searchType"]').forEach(radio => {
+            radio.addEventListener('change', () => 
+            updateSidebarResults());
+        });
 })();
 });

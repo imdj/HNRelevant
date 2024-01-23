@@ -93,6 +93,12 @@ foreach ($scriptFile in $scriptFiles) {
     
         endDateInput.addEventListener('change', () =>
             updateSidebarResults());
+
+        // Run on change of search type (verbatim or similar)
+        document.querySelectorAll('input[name="searchType"]').forEach(radio => {
+            radio.addEventListener('change', () => 
+            updateSidebarResults());
+        });
 "@
 
         $userScriptContent += $mainJsContent

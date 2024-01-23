@@ -1,7 +1,10 @@
-async function searchHackerNews(query, numResults, startDate = 0, endDate = new Date().getTime() / 1000) {
+async function searchHackerNews(type, query, numResults, startDate = 0, endDate = new Date().getTime() / 1000) {
+    query = type === 'verbatim' ? query : optimizeSearchQuery(query);
+
     const id = (new URLSearchParams(document.location.search)).get("id");
     const url = `https://hn.algolia.com/api/v1/search`
-        + `?similarQuery=${encodeURIComponent(query)}`
+        + (type === 'verbatim' ? `?query=` : `?similarQuery=`)
+        + `${encodeURIComponent(query)}`
         + `&tags=story`
         + `&hitsPerPage=${numResults}` // number of results displayed
         + `&filters=NOT objectID:` + id // exclude current submission
@@ -23,6 +26,10 @@ HN_Content.appendChild(sidebar);
     // Number of results: default to 5
     numOfResultsDropdown.value = await loadPreference('results', 5);
     dateRangeDropdown.value = 'All time';
+
+    // Search type: verbatim or similar (default to similar)
+    const searchType = await loadPreference('searchType', 'similar');
+    document.querySelector(`input[name="searchType"][value="${searchType}"]`).checked = true;
 
     // Don't run if mode is set to `manual`
     if (mode !== 'manual') {
@@ -59,5 +66,14 @@ HN_Content.appendChild(sidebar);
         if (mode !== 'manual') {
             updateSidebarResults();
         }
+    });
+
+    // Run on change of search type (verbatim or similar)
+    document.querySelectorAll('input[name="searchType"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            if (mode !== 'manual') {
+                updateSidebarResults();
+            }
+        });
     });
 })();

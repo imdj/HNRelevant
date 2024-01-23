@@ -141,8 +141,37 @@ dateRangeDropdown.addEventListener('change', () => {
     }
 });
 
+// search type radio buttons
+const searchTypeContainer = document.createElement('div');
+
+const searchTypeLabel = createElement('label', {
+    for: 'searchType',
+    style: 'margin-left: 5px;'
+}, [document.createTextNode('Search type')]);
+const verbatimSearch = createElement('input', {
+    type: 'radio',
+    name: 'searchType',
+    value: 'verbatim',
+    style: 'margin-left: 5px;'
+});
+const similarSearch = createElement('input', {
+    type: 'radio',
+    name: 'searchType',
+    value: 'similar',
+    checked: true,
+    style: 'margin-left: 5px;'
+});
+
+searchTypeContainer.appendChild(searchTypeLabel);
+searchTypeContainer.appendChild(verbatimSearch);
+searchTypeContainer.appendChild(document.createTextNode('Verbatim'));
+searchTypeContainer.appendChild(similarSearch);
+searchTypeContainer.appendChild(document.createTextNode('Similar'));
+
+
 sidebarOptionsContainer.appendChild(numberOfResultsLabel);
 sidebarOptionsContainer.appendChild(numOfResultsDropdown);
 sidebarOptionsContainer.appendChild(dateRangeLabel);
 sidebarOptionsContainer.appendChild(dateRangeDropdown);
 sidebarOptionsContainer.appendChild(dateRangeInputContainer);
+sidebarOptionsContainer.appendChild(searchTypeContainer);

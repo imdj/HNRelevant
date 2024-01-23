@@ -73,6 +73,11 @@ function displayResult(object) {
 function updateSidebarResults() {
     sidebarResults.innerHTML = '';
 
+    // Get search type
+    const searchType = document.querySelector('input[name="searchType"]:checked')
+        ? document.querySelector('input[name="searchType"]:checked').value
+        : 'similar';
+
     let endDate = new Date().getTime() / 1000;
     let startDate;
     switch (dateRangeDropdown.value) {
@@ -97,11 +102,19 @@ function updateSidebarResults() {
             startDate = 0;
     }
 
-    searchHackerNews(optimizeSearchQuery(query), numOfResultsDropdown.value, startDate, endDate)
+    searchHackerNews(searchType, query, numOfResultsDropdown.value, startDate, endDate)
         .then(result => {
             const list = document.createElement('ul');
             list.style.padding = 'unset';
             list.style.listStyle = 'none';
+
+            // if no results, display a message
+            if (result.hits.length === 0) {
+                const element = document.createElement('li');
+                element.style = 'padding: 5px 0; text-align: center; white-space: pre-line;';
+                element.textContent = searchType === 'verbatim' ? 'No matching results found.\r\nTry a different query or switch to \'Similar\' search.' : 'No results found. Try to customize the query.';
+                list.appendChild(element);
+            }
             result.hits.forEach(hit => {
                 const element = displayResult(hit);
                 list.appendChild(element);

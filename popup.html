@@ -39,6 +39,19 @@
             <label for="results" class="ml-4">Number of results displayed in the sidebar by default</label>
         </div>
     </div>
+    <div class="ml-2">
+        <h3>Search type</h3>
+        <div>
+            <input type="radio" id="verbatim" name="searchType" value="verbatim">
+            <label for="verbatim">Verbatim</label>
+            <p>Search for exact matches. More precise with less noise. Note that this will not return any results if the search query is not found.</p>
+        </div>
+        <div>
+            <input type="radio" id="similar" name="searchType" value="similar" checked>
+            <label for="similar">Similar (Default)</label>
+            <p>Perform a more generic/exploratory search for related submissions.</p>
+        </div>
+    </div>        
 </div>
 <footer class="flex flex-col mt-8 mb-2 justify-center items-center">
     <span class="mb-2">Follow development on GitHub</span>
