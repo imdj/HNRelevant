@@ -187,23 +187,23 @@ function timestampToRelativeTime(timestamp) {
     const now = new Date();
     const date = new Date(timestamp);
     const diff = now - date;
-    const minute = 60 * 1000;
-    const hour = 60 * minute;
-    const day = 24 * hour;
-    const month = 30 * day;
-    const year = 365 * day;
+    let rtf = new Intl.RelativeTimeFormat('en', { numeric: 'always' });
 
-    if (diff < hour) {
-        return Math.floor(diff / minute) + " minute" + (diff < 2 * minute ? "" : "s") + " ago";
-    } else if (diff < day) {
-        return Math.floor(diff / hour) + " hour" + (diff < 2 * hour ? "" : "s") + " ago";
-    } else if (diff < month) {
-        return Math.floor(diff / day) + " day" + (diff < 2 * day ? "" : "s") + " ago";
-    } else if (diff < year) {
-        return Math.floor(diff / month) + " month" + (diff < 2 * month ? "" : "s") + " ago";
-    } else {
-        return Math.floor(diff / year) + " year" + (diff < 2 * year ? "" : "s") + " ago";
+    const units = {
+        year: 365 * 24 * 60 * 60 * 1000,
+        month: 30 * 24 * 60 * 60 * 1000,
+        hour: 60 * 60 * 1000,
+        minute: 60 * 1000
+    };
+
+    for (const unit in units) {
+        if (diff > units[unit]) {
+            const time = Math.round(diff / units[unit]);
+            return rtf.format(-time, unit);
+        }
     }
+
+    return rtf.format(-Math.round(diff / 1000), 'second');
 }
 
 /* dom.js */
