@@ -58,11 +58,20 @@ function displayResult(object) {
         + 'by '
     );
     description.appendChild(author);
-    description.insertAdjacentText('beforeend',
-        ' | '
-        + timestampToRelativeTime(object.created_at)
-        + ' | '
-    );
+    description.insertAdjacentText('beforeend', ' | ');
+
+    const timeurl = document.createElement('a');
+    timeurl.href = 'item?id=' + object.objectID;
+    timeurl.title = object.created_at;
+
+    const time = document.createElement('time');
+    time.dateTime = object.created_at;
+    time.textContent = timestampToRelativeTime(object.created_at);
+    timeurl.appendChild(time);
+
+    description.appendChild(timeurl);
+    
+    description.insertAdjacentText('beforeend', ' | ');
     description.appendChild(comments);
     element.appendChild(description);
 
