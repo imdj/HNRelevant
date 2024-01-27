@@ -352,10 +352,10 @@ dateRangeDropdown.addEventListener('change', () => {
 
 // search type radio buttons
 const searchTypeContainer = document.createElement('div');
+searchTypeContainer.style.margin = '5px 0';
 
 const searchTypeLabel = createElement('label', {
-    for: 'searchType',
-    style: 'margin-left: 5px;'
+    for: 'searchType'
 }, [document.createTextNode('Search type')]);
 const verbatimSearch = createElement('input', {
     type: 'radio',
