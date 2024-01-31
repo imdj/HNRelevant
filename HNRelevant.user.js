@@ -22,7 +22,7 @@ function optimizeSearchQuery(input) {
     input = stripYearFromTitle(input);
 
     // Remove HN common keywords
-    let HNWords = ['Ask HN', 'Tell HN', 'Show HN'];
+    let HNWords = ['Ask HN', 'Tell HN', 'Show HN', 'Launch HN'];
     input = HNWords.reduce((str, word) => str.replace(new RegExp(word, 'gi'), ''), input);
 
     // Tokenize the sentence into words
