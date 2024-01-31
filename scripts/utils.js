@@ -13,6 +13,10 @@ function loadPreference(key, defaultValue) {
     }
 }
 
+function stripYearFromTitle(title) {
+    return title.replace(/\s\(\d{4}\)$/, '');
+}
+
 // Render dom element for a search result
 function displayResult(object) {
     const element = document.createElement('li');

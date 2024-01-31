@@ -2,6 +2,8 @@ function optimizeSearchQuery(input) {
     // Remove punctuation
     input = input.replace(/[,;:.!?'"]/g, '');
 
+    input = stripYearFromTitle(input);
+
     // Remove HN common keywords
     let HNWords = ['Ask HN', 'Tell HN', 'Show HN'];
     input = HNWords.reduce((str, word) => str.replace(new RegExp(word, 'gi'), ''), input);
@@ -22,7 +24,6 @@ function optimizeSearchQuery(input) {
         return w;
     });
 
-    // Join the words with + to optimize for search 
     let query = stems.join(' ');
     return query;
 }
