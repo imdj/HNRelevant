@@ -27,6 +27,12 @@
   "permissions": [
     "storage"
   ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "hnrelevant@extensions.imdj.dev",
+      "strict_min_version": "109"
+    }
+  },
   "action": {
     "default_icon": {
       "16": "./assets/images/icon-16.png",
