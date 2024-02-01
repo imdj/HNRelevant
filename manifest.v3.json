@@ -9,6 +9,7 @@
     "128": "./assets/images/icon-128.png"
   },
   "host_permissions": [
+    "https://hn.algolia.com/api/*",
     "https://news.ycombinator.com/*"
   ],
   "content_scripts": [
