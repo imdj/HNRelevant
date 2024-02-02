@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "HNRelevant",
   "description": "Shows relevant submissions on Hacker News",
   "version": "0.1.13",
@@ -8,23 +8,17 @@
     "48": "./assets/images/icon-48.png",
     "128": "./assets/images/icon-128.png"
   },
-  "permissions": [
-    "storage",
+  "host_permissions": [
     "*://hn.algolia.com/api/*",
     "*://news.ycombinator.com/*"
   ],
-  "applications": {
-    "gecko": {
-      "id": "hnrelevant@extensions.imdj.dev",
-      "strict_min_version": "48.0"
-    }
-  },
   "content_scripts": [
     {
       "matches": [
         "https://news.ycombinator.com/item*"
       ],
       "js": [
+        "./scripts/third-party/browser-polyfill.min.js",
         "./scripts/query.js",
         "./scripts/utils.js",
         "./scripts/dom.js",
@@ -32,13 +26,22 @@
       ]
     }
   ],
+  "permissions": [
+    "storage"
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "hnrelevant@extensions.imdj.dev",
+      "strict_min_version": "109"
+    }
+  },
   "background": {
     "scripts": [
       "./scripts/third-party/browser-polyfill.min.js",
       "./scripts/background/get-results.js"
     ]
   },
-  "browser_action": {
+  "action": {
     "default_icon": {
       "16": "./assets/images/icon-16.png",
       "48": "./assets/images/icon-48.png",

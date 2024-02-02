@@ -1,3 +1,33 @@
+const permissionsToRequest = {
+    origins: ["*://news.ycombinator.com/*", "*://hn.algolia.com/api/*"]
+}
+
+function requestPermission() {
+    const requestPromise = browser.permissions.request(permissionsToRequest);
+    window.close();
+    requestPromise.then((response) => {
+        if(response) {
+            // Reload the page so that the extension can start working
+            browser.tabs.reload();
+        } else {
+            alert("Error: HNRelevant failed to acquire permissions needed to work properly");
+        }
+    });
+}
+
+(async () => {
+    const permissionStatus = await browser.permissions.contains(permissionsToRequest);
+ 
+    if (!permissionStatus) {
+        const grantPermissionButton = document.createElement("button");
+        grantPermissionButton.textContent = "Grant Permission";
+        grantPermissionButton.style = "font-size: 1.5em; padding: 0.5em; margin: 0.5em; border-radius: 0.5em; border: 0.1em solid black; background-color: #ff6600; color: white; cursor: pointer;";
+        grantPermissionButton.addEventListener("click", requestPermission);
+        document.body.innerHTML = "";
+        document.body.appendChild(grantPermissionButton);
+    }
+})();
+
 const isChrome = chrome.storage.sync ? true : false;
 
 // get references to the input elements

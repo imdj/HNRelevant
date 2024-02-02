@@ -9,6 +9,7 @@ html {
 body {
     width: 350px;
     max-width: 100%;
+    min-height: 300px;
 }
 
 .relative {

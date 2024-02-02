@@ -9,8 +9,8 @@
     "128": "./assets/images/icon-128.png"
   },
   "host_permissions": [
-    "https://hn.algolia.com/api/*",
-    "https://news.ycombinator.com/*"
+    "*://hn.algolia.com/api/*",
+    "*://news.ycombinator.com/*"
   ],
   "content_scripts": [
     {
@@ -18,6 +18,7 @@
         "https://news.ycombinator.com/item*"
       ],
       "js": [
+        "./scripts/third-party/browser-polyfill.min.js",
         "./scripts/query.js",
         "./scripts/utils.js",
         "./scripts/dom.js",
@@ -28,11 +29,8 @@
   "permissions": [
     "storage"
   ],
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "hnrelevant@extensions.imdj.dev",
-      "strict_min_version": "109"
-    }
+  "background": {
+    "service_worker": "./scripts/background/get-results.js"
   },
   "action": {
     "default_icon": {
