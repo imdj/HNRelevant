@@ -91,6 +91,9 @@ function updateSidebarResults() {
         ? document.querySelector('input[name="searchType"]:checked').value
         : 'similar';
 
+    let itemId = (new URLSearchParams(document.location.search)).get("id");
+    query = searchType === 'verbatim' ? query : optimizeSearchQuery(query);
+
     let endDate = new Date().getTime() / 1000;
     let startDate;
     switch (dateRangeDropdown.value) {
@@ -115,28 +118,25 @@ function updateSidebarResults() {
             startDate = 0;
     }
 
-    searchHackerNews(searchType, query, numOfResultsDropdown.value, startDate, endDate)
-        .then(result => {
-            const list = document.createElement('ul');
-            list.style.padding = 'unset';
-            list.style.listStyle = 'none';
+    browser.runtime.sendMessage({itemId, searchType, query, numResults: numOfResultsDropdown.value, startDate, endDate}).then((result) => {
+        const list = document.createElement('ul');
+        list.style.padding = 'unset';
+        list.style.listStyle = 'none';
 
-            // if no results, display a message
-            if (result.hits.length === 0) {
-                const element = document.createElement('li');
-                element.style = 'padding: 5px 0; text-align: center; white-space: pre-line;';
-                element.textContent = searchType === 'verbatim' ? 'No matching results found.\r\nTry a different query or switch to \'Similar\' search.' : 'No results found. Try to customize the query.';
-                list.appendChild(element);
-            }
-            result.hits.forEach(hit => {
-                const element = displayResult(hit);
-                list.appendChild(element);
-            });
-            sidebarResults.appendChild(list);
-        })
-        .catch(error => {
-            sidebarResults.textContent = `An error occurred: ${error.message}`;
+        // if no results, display a message
+        if (result.hits.length === 0) {
+            const element = document.createElement('li');
+            element.style = 'padding: 5px 0; text-align: center; white-space: pre-line;';
+            element.textContent = searchType === 'verbatim' ? 'No matching results found.\r\nTry a different query or switch to \'Similar\' search.' : 'No results found. Try to customize the query.';
+            list.appendChild(element);
+        }
+        result.hits.forEach(hit => {
+            const element = displayResult(hit);
+            list.appendChild(element);
         });
+        sidebarResults.appendChild(list);
+    }
+    );
 }
 
 // Get relative time from timestamp

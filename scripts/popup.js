@@ -1,3 +1,32 @@
+const permissionsToRequest = {
+    origins: ["*://news.ycombinator.com/*", "*://hn.algolia.com/api/*"]
+}
+
+function requestPermission() {
+    browser.permissions.request(permissionsToRequest);
+    window.close();
+}
+
+(async () => {
+    const permissionStatus = await browser.permissions.contains(permissionsToRequest);
+ 
+    if (!permissionStatus) {
+        document.body.innerHTML = "";
+
+        const description = document.createElement("p");
+        description.textContent = "HNRelevant needs some permissions to access Hacker News and Algolia API to fetch results.";
+        description.style = "padding: 0.5em; margin-bottom: 1em;";
+        document.body.appendChild(description);
+
+        const grantPermissionButton = document.createElement("button");
+        grantPermissionButton.textContent = "Grant Permission";
+        grantPermissionButton.style = "font-size: 1.5em; padding: 0.5em; margin: 0.5em; border: 0; border-radius: 0.5em; background-color: #ff6600; color: white; cursor: pointer;";
+        grantPermissionButton.addEventListener("click", requestPermission);
+
+        document.body.appendChild(grantPermissionButton);
+    }
+})();
+
 const isChrome = chrome.storage.sync ? true : false;
 
 // get references to the input elements
