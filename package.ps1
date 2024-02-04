@@ -5,7 +5,8 @@ $baseDir = Get-Location
 $requiredFiles = @(
     "LICENSE"
     "manifest.v2.json",
-    "manifest.v3.json",
+    "manifest.v3.chrome.json",
+    "manifest.v3.firefox.json",
     "popup.html",
     "scripts",
     "assets",
@@ -36,7 +37,7 @@ if (Test-Path $outputDir) {
 New-Item -Path $outputDir -ItemType Directory | Out-Null
 
 # Read and parse manifest.v3.json
-$manifestPath = Join-Path $baseDir "manifest.v3.json"
+$manifestPath = Join-Path $baseDir "manifest.v3.chrome.json"
 $manifestContent = Get-Content $manifestPath -Raw | ConvertFrom-Json
 
 # Extract userscript metadata
@@ -115,7 +116,7 @@ $userScriptContent += "`n" + @"
 Set-Content -Path (Join-Path $baseDir "HNRelevant.user.js") -Value $userScriptContent
 
 # Create packages for manifest v2 and v3
-foreach ($manifest in @("manifest.v2.json", "manifest.v3.json")) {
+foreach ($manifest in @("manifest.v2.json", "manifest.v3.chrome.json", "manifest.v3.firefox.json")) {
     $filesToPackage = @(
         "LICENSE"
         "popup.html",
