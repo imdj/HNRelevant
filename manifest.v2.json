@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "HNRelevant",
   "description": "Shows relevant submissions on Hacker News",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "icons": {
     "16": "./assets/images/icon-16.png",
     "48": "./assets/images/icon-48.png",
@@ -16,7 +16,7 @@
   "applications": {
     "gecko": {
       "id": "hnrelevant@extensions.imdj.dev",
-      "strict_min_version": "48.0"
+      "strict_min_version": "57.0"
     }
   },
   "content_scripts": [
