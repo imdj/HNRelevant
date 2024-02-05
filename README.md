@@ -1,12 +1,12 @@
 <div><img src="./preview.png" style="min-width: 100%" alt="preview of the relevant submissions section on hacker news"/></div>
 
 # HNRelevant
-A browser extension that shows related submissions to the one you're viewing on Hacker News. The results are generated on page load and displayed in a sidebar that's embedded into the page.
+A lightweight browser extension that augments your Hacker News experience by showing related submissions to the one you're viewing. It helps you immerse yourself in interesting discussions and uncover overlooked gems.
 
 ### Features
-- Gain a broader perspective and explore different angles
+- Related submissions ready to be explored
 - Two modes:
-    - Automatic: Enjoy a seamless experience with results generated upon page load.
+    - Automatic: Enjoy a seamless experience with results generated upon page load
     - Manual: Search only when desired
 - The result blends naturally with Hacker News's interface and match its look and feel
 - Manageable preferences via the extension's popup in the browser toolbar
