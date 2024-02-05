@@ -4,9 +4,12 @@
 A browser extension that shows related submissions to the one you're viewing on Hacker News. The results are generated on page load and displayed in a sidebar that's embedded into the page.
 
 ### Features
-- **Seamless and easy to use:** Generated automatically and embedded directly into the page
-- **Native look and feel:** Well integrated with the page structure of Hacker News and use global CSS rules like the rest of the site.
-- **Fine-tunable query:** If the initial results are not relevant enough (because the submission title is not optimized), you can easily submit a custom query for better results.
+- Gain a broader perspective and explore different angles
+- Two modes:
+    - Automatic: Enjoy a seamless experience with results generated upon page load.
+    - Manual: Search only when desired
+- The result blends naturally with Hacker News's interface and match its look and feel
+- Manageable preferences via the extension's popup in the browser toolbar
 
 ### How it works
 It's based on [HN algolia search API](https://hn.algolia.com/api) and uses the submission title as its initial query
