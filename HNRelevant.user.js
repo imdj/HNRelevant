@@ -235,7 +235,7 @@ const sidebarHTML = `
                     <option value="30">30</option>
                 </select>
             </div>
-            <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 5px;">
+            <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 5px; margin: 5px 0;">
                 <div>
                     <label for="dateRangeDropdown">Date</label>
                     <select style="margin-left: 5px;" id="dateRangeDropdown">
@@ -269,8 +269,8 @@ const sidebarHTML = `
                 </span>
             </fieldset>
         </div>
-        <p id="sidebarResults">
-        </p>
+        <div id="sidebarResults">
+        </div>
     </td>
 `;
 
