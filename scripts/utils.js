@@ -1,18 +1,82 @@
-// load preference from storage
-function loadPreference(key, defaultValue) {
-    if (chrome.storage) {
-        return new Promise((resolve, reject) => {
-            chrome.storage.sync.get(key, result => {
-                resolve(result[key] || defaultValue);
-            });
-        });
-    } else { // Firefox
-        return browser.storage.sync.get(key).then(result => {
-            return result[key] || defaultValue;
-        });
-    }
+async function loadPreferences() {
+    const preferences = await browser.storage.sync.get('hnrelevant');
+    return preferences.hnrelevant;
 }
 
+function savePreferences(preferences) {
+    browser.storage.sync.set({ hnrelevant: preferences });
+    return preferences;
+}
+
+function optimizeSearchQuery() {
+    // Remove punctuation
+    searchQuery.query = searchQuery.rawQuery.replace(/[,;:.!?'"]/g, '');
+
+    searchQuery.query = stripYearFromTitle(searchQuery.query);
+
+    // Remove HN common keywords
+    let HNWords = ['Ask HN', 'Tell HN', 'Show HN', 'Launch HN'];
+    searchQuery.query = HNWords.reduce((str, word) => str.replace(new RegExp(word, 'gi'), ''), searchQuery.query);
+
+    // Tokenize the sentence into words
+    let words = searchQuery.query.toLowerCase().split(' ');
+
+    // Remove stop words
+    let stopWords = ['a', 'an', 'the', 'is', 'are', 'was', 'and', 'or'];
+    words = words.filter(w => !stopWords.includes(w));
+
+    // Apply stemming to the words
+    let stems = words.map(w => {
+        if (w.length < 3) return w;
+        if (w.endsWith('ies') && w.length > 4) w = w.slice(0, -3) + 'y';
+        if (w.endsWith('es') && w.length > 3) w = w.slice(0, -2);
+        if (w.endsWith('s') && w.length > 2) w = w.slice(0, -1);
+        return w;
+    });
+
+    return stems.join(' ');
+}
+
+async function searchHackerNews() {
+    searchQuery.query = optimizeSearchQuery();
+    const url = `https://hn.algolia.com/api/v1/search`
+        + (searchQuery.type === 'verbatim' ? `?query=${encodeURIComponent(searchQuery.rawQuery)}` : `?similarQuery=${encodeURIComponent(searchQuery.query)}`)
+        + `&tags=story`
+        + `&hitsPerPage=${searchQuery.numOfResults}`
+        + `&filters=NOT objectID:` + itemId // exclude current submission
+        + `&numericFilters=created_at_i>${searchQuery.date.start},created_at_i<${searchQuery.date.end}` // filter by date
+        ;
+
+    const response = await fetch(url).then(response => response.json());
+    return response;
+}
+
+// Get relative time from timestamp
+function timestampToRelativeTime(timestamp) {
+    const now = new Date();
+    const date = new Date(timestamp);
+    const diff = now - date;
+    let rtf = new Intl.RelativeTimeFormat('en', { numeric: 'always' });
+
+    const units = {
+        year: 365 * 24 * 60 * 60 * 1000,
+        month: 30 * 24 * 60 * 60 * 1000,
+        day: 24 * 60 * 60 * 1000,
+        hour: 60 * 60 * 1000,
+        minute: 60 * 1000
+    };
+
+    for (const unit in units) {
+        if (diff > units[unit]) {
+            const time = Math.round(diff / units[unit]);
+            return rtf.format(-time, unit);
+        }
+    }
+
+    return rtf.format(-Math.round(diff / 1000), 'second');
+}
+
+// i.e. "Title (2021)" -> "Title"
 function stripYearFromTitle(title) {
     return title.replace(/\s\(\d{4}\)$/, '');
 }
@@ -36,10 +100,10 @@ function displayResult(object) {
         const domainContainer = document.createElement('span');
         domainContainer.classList.add('sitebit', 'comhead');
         const domain = document.createElement('a');
-        domain.href = 'from?site=' + (new URL(object.url)).hostname.replace('www.','');
+        domain.href = 'from?site=' + (new URL(object.url)).hostname.replace('www.', '');
         const domainChild = document.createElement('span');
         domainChild.classList.add('sitestr');
-        domainChild.textContent = (new URL(object.url)).hostname.replace('www.','');
+        domainChild.textContent = (new URL(object.url)).hostname.replace('www.', '');
 
         domain.appendChild(domainChild);
         domainContainer.appendChild(domain);
@@ -74,7 +138,7 @@ function displayResult(object) {
     timeurl.appendChild(time);
 
     description.appendChild(timeurl);
-    
+
     description.insertAdjacentText('beforeend', ' | ');
     description.appendChild(comments);
     element.appendChild(description);
@@ -82,43 +146,37 @@ function displayResult(object) {
     return element;
 }
 
-// Update sidebar content
-function updateSidebarResults() {
-    sidebarResults.innerHTML = '';
+function updateDateRange() {
+    const dateRange = document.getElementById('dateRangeDropdown').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
 
-    // Get search type
-    const searchType = document.querySelector('input[name="searchType"]:checked')
-        ? document.querySelector('input[name="searchType"]:checked').value
-        : 'similar';
+    searchQuery.date.end = Math.floor(new Date().getTime() / 1000);
 
-    let itemId = (new URLSearchParams(document.location.search)).get("id");
-    query = searchType === 'verbatim' ? query : optimizeSearchQuery(query);
-
-    let endDate = new Date().getTime() / 1000;
-    let startDate;
-    switch (dateRangeDropdown.value) {
+    switch (dateRange) {
         case 'Past week':
-            startDate = endDate - 604800;
+            searchQuery.date.start = searchQuery.date.end - 604800;
             break;
         case 'Past month':
-            startDate = endDate - 2592000;
+            searchQuery.date.start = searchQuery.date.end - 2592000;
             break;
         case 'Past year':
-            startDate = endDate - 31536000;
+            searchQuery.date.start = searchQuery.date.end - 31536000;
             break;
         case 'Custom':
-            const startDateValue = document.getElementById('startDate').value;
-            const endDateValue = document.getElementById('endDate').value;
-            
-            // if one of the dates is not set, use the default value
-            endDate = endDateValue ? new Date(endDateValue).getTime() / 1000 : endDate;
-            startDate = startDateValue ? new Date(startDateValue).getTime() / 1000 : 0;
+            searchQuery.date.start = Math.floor(new Date(startDate).getTime() / 1000) || 0;
+            searchQuery.date.end = Math.floor(new Date(endDate).getTime() / 1000) || searchQuery.date.end;
             break;
         default:
-            startDate = 0;
+            searchQuery.date.start = 0;
     }
+}
 
-    browser.runtime.sendMessage({itemId, searchType, query, numResults: numOfResultsDropdown.value, startDate, endDate}).then((result) => {
+// Update sidebar content
+function updateResults() {
+    document.getElementById('sidebarResults').innerHTML = '';
+
+    searchHackerNews().then((result) => {
         const list = document.createElement('ul');
         list.style.padding = 'unset';
         list.style.listStyle = 'none';
@@ -127,39 +185,14 @@ function updateSidebarResults() {
         if (result.hits.length === 0) {
             const element = document.createElement('li');
             element.style = 'padding: 5px 0; text-align: center; white-space: pre-line;';
-            element.textContent = searchType === 'verbatim' ? 'No matching results found.\r\nTry a different query or switch to \'Similar\' search.' : 'No results found. Try to customize the query.';
+            element.textContent = searchQuery.type === 'verbatim' ? 'No matching results found.\r\nTry a different query or switch to \'Similar\' search.' : 'No results found. Try to customize the query.';
             list.appendChild(element);
         }
         result.hits.forEach(hit => {
             const element = displayResult(hit);
             list.appendChild(element);
         });
-        sidebarResults.appendChild(list);
+        document.getElementById('sidebarResults').appendChild(list);
     }
     );
-}
-
-// Get relative time from timestamp
-function timestampToRelativeTime(timestamp) {
-    const now = new Date();
-    const date = new Date(timestamp);
-    const diff = now - date;
-    let rtf = new Intl.RelativeTimeFormat('en', { numeric: 'always' });
-
-    const units = {
-        year: 365 * 24 * 60 * 60 * 1000,
-        month: 30 * 24 * 60 * 60 * 1000,
-        day: 24 * 60 * 60 * 1000,
-        hour: 60 * 60 * 1000,
-        minute: 60 * 1000
-    };
-
-    for (const unit in units) {
-        if (diff > units[unit]) {
-            const time = Math.round(diff / units[unit]);
-            return rtf.format(-time, unit);
-        }
-    }
-
-    return rtf.format(-Math.round(diff / 1000), 'second');
 }

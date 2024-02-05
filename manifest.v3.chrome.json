@@ -19,9 +19,7 @@
       ],
       "js": [
         "./scripts/third-party/browser-polyfill.min.js",
-        "./scripts/query.js",
         "./scripts/utils.js",
-        "./scripts/dom.js",
         "./scripts/main.js"
       ]
     }

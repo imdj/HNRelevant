@@ -27,85 +27,59 @@ function requestPermission() {
     }
 })();
 
-const isChrome = chrome.storage.sync ? true : false;
 
 // get references to the input elements
 const modeRadioButtons = document.getElementsByName("mode");
-const resultsDropdown = document.getElementsByName("results")[0];
+const resultsDropdown = document.getElementById("results");
 const searchType = document.getElementsByName("searchType");
 
-if (isChrome) { // load saved settings from storage in Chrome
-    chrome.storage.sync.get(["mode", "results","searchType"], function (settings) {
-        // set the input elements to the saved values
-        if (settings.mode) {
-            for (const radioButton of modeRadioButtons) {
-                if (radioButton.value === settings.mode) {
-                    radioButton.checked = true;
-                    break;
-                }
-            }
-        }
-        if (settings.searchType) {
-            for (const radioButton of searchType) {
-                if (radioButton.value === settings.searchType) {
-                    radioButton.checked = true;
-                    break;
-                }
-            }
-        }
-        if (settings.results) {
-            resultsDropdown.value = settings.results;
+async function initPopup() {
+    const preferences = await loadPreferences() || savePreferences({
+        mode: "auto", // "auto" or "manual"
+        rawQuery: "",
+        query: "",
+        type: "similar", // "similar" or "verbatim"
+        numOfResults: 15,
+        date: {
+            start: 0,
+            end: new Date().getTime() / 1000
         }
     });
-} else { // load saved settings from storage in Firefox
-    browser.storage.sync.get(["mode", "results","searchType"], function (settings) {
-        // set the input elements to the saved values
-        if (settings.mode) {
-            for (const radioButton of modeRadioButtons) {
-                if (radioButton.value === settings.mode) {
-                    radioButton.checked = true;
-                    break;
-                }
-            }
-        }
-        if (settings.searchType) {
-            for (const radioButton of searchType) {
-                if (radioButton.value === settings.searchType) {
-                    radioButton.checked = true;
-                    break;
-                }
-            }
-        }
-        if (settings.results) {
-            resultsDropdown.value = settings.results;
-        }
-    });
-}
 
-// add event listeners to the input elements
-for (const radioButton of modeRadioButtons) {
-    radioButton.addEventListener("change", function () {
-        if (isChrome) { // save the selected mode to storage in Chrome
-            chrome.storage.sync.set({mode: this.value});
-        } else { // save the selected mode to storage in Firefox
-            browser.storage.sync.set({mode: this.value});
+    // set the input elements to the saved values
+    for (const radioButton of modeRadioButtons) {
+        if (radioButton.value === preferences.mode) {
+            radioButton.checked = true;
+            break;
         }
-    });
-}
-resultsDropdown.addEventListener("change", function () {
-    if (isChrome) { // save the selected results to storage in Chrome
-        chrome.storage.sync.set({results: this.value});
-    } else { // save the selected results to storage in Firefox
-        browser.storage.sync.set({results: this.value});
     }
-});
-
-for (const radioButton of searchType) {
-    radioButton.addEventListener("change", function () {
-        if (isChrome) { // save the selected mode to storage in Chrome
-            chrome.storage.sync.set({searchType: this.value});
-        } else { // save the selected mode to storage in Firefox
-            browser.storage.sync.set({searchType: this.value});
+    for (const radioButton of searchType) {
+        if (radioButton.value === preferences.type) {
+            radioButton.checked = true;
+            break;
         }
-    });
+    }
+    resultsDropdown.value = preferences.numOfResults;
+
+    // add event listeners to the input elements
+    for (const radioButton of modeRadioButtons) {
+        radioButton.addEventListener("change", (event) => {
+            preferences.mode = event.target.value;
+            savePreferences(preferences);
+        });
+    }
+    resultsDropdown.addEventListener("change", (event) => {
+        preferences.numOfResults = event.target.value;
+        savePreferences(preferences);
+        }
+    );
+
+    for (const radioButton of searchType) {
+        radioButton.addEventListener("change", (event) => {
+            preferences.type = event.target.value;
+            savePreferences(preferences);
+        });
+    }
 }
+
+initPopup();
