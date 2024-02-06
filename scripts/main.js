@@ -78,6 +78,12 @@ function updateData(key, value) {
 }
 
 async function installSidebar() {
+    // Submissions and Comments share the same page URL
+    // Abort if we are not on a submission page
+    if (!document.querySelector('.fatitem .titleline')) {
+        return;
+    }
+
     // Load preferences from storage
     // if not present save the default preferences to storage and use them
     searchQuery = await loadPreferences() || savePreferences(searchQuery);

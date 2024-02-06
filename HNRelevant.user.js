@@ -283,6 +283,12 @@ function updateData(key, value) {
 }
 
 function installSidebar() {
+    // Submissions and Comments share the same page URL
+    // Abort if we are not on a submission page
+    if (!document.querySelector('.fatitem .titleline')) {
+        return;
+    }
+
     const hnBody = document.querySelector('#hnmain > tbody');
     let NavbarIndex = 0;
     const rows = hnBody.querySelectorAll("tr");
