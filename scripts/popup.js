@@ -61,6 +61,17 @@ async function initPopup() {
     }
     resultsDropdown.value = preferences.numOfResults;
 
+    // Set review button
+    const reviewButton = document.getElementById("review-btn");
+    if (chrome.runtime.getURL('').startsWith('moz-extension://')) {
+        reviewButton.textContent = "Review on Firefox Add-ons";
+        reviewButton.href = `https://addons.mozilla.org/en-US/firefox/addon/hnrelevant/`;
+    }
+    else {
+        reviewButton.textContent = "Review on Chrome Web Store";
+        reviewButton.href = `https://chromewebstore.google.com/detail/hnrelevant/iajhnkeiioebplnbfkpnlnggkgblmoln`;
+    }
+
     // add event listeners to the input elements
     for (const radioButton of modeRadioButtons) {
         radioButton.addEventListener("change", (event) => {
