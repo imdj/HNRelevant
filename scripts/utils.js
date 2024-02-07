@@ -37,20 +37,6 @@ function optimizeSearchQuery() {
     return stems.join(' ');
 }
 
-async function searchHackerNews() {
-    searchQuery.query = optimizeSearchQuery();
-    const url = `https://hn.algolia.com/api/v1/search`
-        + (searchQuery.type === 'verbatim' ? `?query=${encodeURIComponent(searchQuery.rawQuery)}` : `?similarQuery=${encodeURIComponent(searchQuery.query)}`)
-        + `&tags=story`
-        + `&hitsPerPage=${searchQuery.numOfResults}`
-        + `&filters=NOT objectID:` + itemId // exclude current submission
-        + `&numericFilters=created_at_i>${searchQuery.date.start},created_at_i<${searchQuery.date.end}` // filter by date
-        ;
-
-    const response = await fetch(url).then(response => response.json());
-    return response;
-}
-
 // Get relative time from timestamp
 function timestampToRelativeTime(timestamp) {
     const now = new Date();
@@ -175,8 +161,9 @@ function updateDateRange() {
 // Update sidebar content
 function updateResults() {
     document.getElementById('sidebarResults').innerHTML = '';
+    searchQuery.query = optimizeSearchQuery();
 
-    searchHackerNews().then((result) => {
+    browser.runtime.sendMessage({id: itemId, object: searchQuery}).then((result) => {
         const list = document.createElement('ul');
         list.style.padding = 'unset';
         list.style.listStyle = 'none';
