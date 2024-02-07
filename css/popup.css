@@ -129,10 +129,9 @@ p {
     border-radius: 0.5rem;
     border: 3px solid #E3E3E3;
     cursor: pointer;
-    font-size: smaller;
     color: #000;
     background: #fff;
-    transition: 0.5s;
+    transition: 0.3s;
     margin: 0 0.5rem;
 }
 
@@ -147,6 +146,16 @@ a.btn {
 
 .btn svg {
     margin-left: 10px;
+}
+
+.main-btn {
+    border-color: #ff6600;
+    cursor: pointer;
+}
+
+.main-btn:hover, .main-btn:focus {
+    background: #ff6600;
+    color: #fff;
 }
 
 input[type="checkbox"] {

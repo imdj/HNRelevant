@@ -20,7 +20,8 @@ function requestPermission() {
 
         const grantPermissionButton = document.createElement("button");
         grantPermissionButton.textContent = "Grant Permission";
-        grantPermissionButton.style = "font-size: 1.5em; padding: 0.5em; margin: 0.5em; border: 0; border-radius: 0.5em; background-color: #ff6600; color: white; cursor: pointer;";
+        grantPermissionButton.classList = "btn main-btn";
+        grantPermissionButton.style = "font-size: 1.5em;";
         grantPermissionButton.addEventListener("click", requestPermission);
 
         document.body.appendChild(grantPermissionButton);
