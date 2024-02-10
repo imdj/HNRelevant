@@ -93,7 +93,7 @@ function displayResult(object) {
 
         domain.appendChild(domainChild);
         domainContainer.appendChild(domain);
-        domain.insertAdjacentText('beforebegin', '(');
+        domain.insertAdjacentText('beforebegin', ' (');
         domain.insertAdjacentText('afterend', ')');
         titleContainer.appendChild(domainContainer);
     }

@@ -127,7 +127,7 @@ function displayResult(object) {
 
         domain.appendChild(domainChild);
         domainContainer.appendChild(domain);
-        domain.insertAdjacentText('beforebegin', '(');
+        domain.insertAdjacentText('beforebegin', ' (');
         domain.insertAdjacentText('afterend', ')');
         titleContainer.appendChild(domainContainer);
     }
@@ -257,10 +257,6 @@ const style = `
 #hnrelevant-results-list .result {
     padding: 5px 0;
     min-width: 280px;
-}
-
-#hnrelevant-results-list .result .titleline > * {
-    display: inline-block;
 }
 
 @media screen and (max-width: 1200px) {

@@ -38,10 +38,6 @@
     min-width: 280px;
 }
 
-#hnrelevant-results-list .result .titleline > * {
-    display: inline-block;
-}
-
 @media screen and (max-width: 1200px) {
     #hnrelevant-results {
         display: grid;
