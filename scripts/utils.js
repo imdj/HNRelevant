@@ -70,7 +70,7 @@ function stripYearFromTitle(title) {
 // Render dom element for a search result
 function displayResult(object) {
     const element = document.createElement('li');
-    element.style.padding = '5px 0';
+    element.className = 'result';
 
     const titleContainer = document.createElement('span');
     titleContainer.style.display = 'block';
@@ -160,26 +160,27 @@ function updateDateRange() {
 
 // Update sidebar content
 function updateResults() {
-    document.getElementById('sidebarResults').innerHTML = '';
+    document.getElementById('hnrelevant-results').innerHTML = '';
     searchQuery.query = optimizeSearchQuery();
 
     browser.runtime.sendMessage({id: itemId, object: searchQuery}).then((result) => {
         const list = document.createElement('ul');
-        list.style.padding = 'unset';
-        list.style.listStyle = 'none';
+        list.id = 'hnrelevant-results-list';
 
         // if no results, display a message
         if (result.hits.length === 0) {
             const element = document.createElement('li');
+            element.className = 'result';
             element.style = 'padding: 5px 0; text-align: center; white-space: pre-line;';
             element.textContent = searchQuery.type === 'verbatim' ? 'No matching results found.\r\nTry a different query or switch to \'Similar\' search.' : 'No results found. Try to customize the query.';
             list.appendChild(element);
         }
-        result.hits.forEach(hit => {
-            const element = displayResult(hit);
-            list.appendChild(element);
-        });
-        document.getElementById('sidebarResults').appendChild(list);
-    }
-    );
+        else {
+            result.hits.forEach(hit => {
+                const element = displayResult(hit);
+                list.appendChild(element);
+            });
+        }
+        document.getElementById('hnrelevant-results').appendChild(list);
+    });
 }

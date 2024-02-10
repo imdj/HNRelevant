@@ -104,7 +104,7 @@ function stripYearFromTitle(title) {
 // Render dom element for a search result
 function displayResult(object) {
     const element = document.createElement('li');
-    element.style.padding = '5px 0';
+    element.className = 'result';
 
     const titleContainer = document.createElement('span');
     titleContainer.style.display = 'block';
@@ -194,38 +194,106 @@ function updateDateRange() {
 
 // Update sidebar content
 function updateResults() {
-    document.getElementById('sidebarResults').innerHTML = '';
+    document.getElementById('hnrelevant-results').innerHTML = '';
 
     searchHackerNews().then((result) => {
         const list = document.createElement('ul');
-        list.style.padding = 'unset';
-        list.style.listStyle = 'none';
+        list.id = 'hnrelevant-results-list';
 
         // if no results, display a message
         if (result.hits.length === 0) {
             const element = document.createElement('li');
+            element.className = 'result';
             element.style = 'padding: 5px 0; text-align: center; white-space: pre-line;';
             element.textContent = searchQuery.type === 'verbatim' ? 'No matching results found.\r\nTry a different query or switch to \'Similar\' search.' : 'No results found. Try to customize the query.';
             list.appendChild(element);
         }
-        result.hits.forEach(hit => {
-            const element = displayResult(hit);
-            list.appendChild(element);
-        });
-        document.getElementById('sidebarResults').appendChild(list);
-    }
-    );
+        else {
+            result.hits.forEach(hit => {
+                const element = displayResult(hit);
+                list.appendChild(element);
+            });
+        }
+        document.getElementById('hnrelevant-results').appendChild(list);
+    });
 }
 
-const sidebarHTML = `
-    <td style="min-width: 250px; width: 25%; vertical-align: baseline; margin-left: 20px;">
-        <h2>Relevant Submissions</h2>
-        <div>
-            <div style="display: flex; flex-direction: row; align-items: center; margin: 5px 0; padding-right: 10px;">
-                <input id="queryCustomization" style="margin: 5px 0; flex-grow: 1;" placeholder="${searchQuery.rawQuery}" value="${searchQuery.query}">
-                <button type="submit" id="submitCustomization" style="margin-left: 5px;">Submit</button>
-            </div>
-            <div style="margin: 5px 0;">
+const style = `
+#hnrelevant-controls-container, #hnrelevant-controls {
+    display: flex;
+    gap: 10px
+}
+
+#hnrelevant-controls-container {
+    flex-direction: column;
+}
+
+#hnrelevant-controls {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+#query-customization-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 5px 0;
+    padding-right: 10px;
+}
+
+#queryCustomization {
+    flex-grow: 1;
+}
+
+#hnrelevant-results-list {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#hnrelevant-results-list .result {
+    padding: 5px 0;
+    min-width: 280px;
+}
+
+#hnrelevant-results-list .result .titleline > * {
+    display: inline-block;
+}
+
+@media screen and (max-width: 1200px) {
+    #hnrelevant-results {
+        display: grid;
+    }
+
+    #hnrelevant-results-list {
+        flex-direction: row;
+        gap: 10px;
+        overflow-x: auto;
+    }
+
+    #hnrelevant-results-list .result {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border: 1px solid #d3d3d3;
+        border-radius: 5px;
+        padding: 5px;
+    }
+}
+`;
+
+const relevantContent = `
+    <h2 id="hnrelevant-header">Relevant Submissions</h2>
+    <div id="hnrelevant-controls-container">
+        <div id="query-customization-container">
+            <input id="queryCustomization" placeholder="${searchQuery.rawQuery}" value="${searchQuery.query}">
+            <button type="submit" id="submitCustomization" style="margin-left: 5px;">Submit</button>
+        </div>
+        <div id="hnrelevant-controls">
+            <div>
                 <label for="numOfResultsDropdown">Num of results</label>
                 <select style="margin-left: 5px;" id="numOfResultsDropdown">
                     <option value="5">5</option>
@@ -235,29 +303,27 @@ const sidebarHTML = `
                     <option value="30">30</option>
                 </select>
             </div>
-            <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 5px; margin: 5px 0;">
-                <div>
-                    <label for="dateRangeDropdown">Date</label>
-                    <select style="margin-left: 5px;" id="dateRangeDropdown">
-                        <option value="Past week">Past week</option>
-                        <option value="Past month">Past month</option>
-                        <option value="Past year">Past year</option>
-                        <option value="All time" selected>All time</option>
-                        <option value="Custom">Custom</option>
-                    </select>
+            <div>
+                <label for="dateRangeDropdown">Date</label>
+                <select style="margin-left: 5px;" id="dateRangeDropdown">
+                    <option value="Past week">Past week</option>
+                    <option value="Past month">Past month</option>
+                    <option value="Past year">Past year</option>
+                    <option value="All time" selected>All time</option>
+                    <option value="Custom">Custom</option>
+                </select>
+            </div>
+            <div id="dateRangeInputContainer" style="display: none;">
+                <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
+                    <label for="startDate">Start</label>
+                    <input type="date" id="startDate" style="margin-left: 5px;">
                 </div>
-                <div id="dateRangeInputContainer" style="display: none;">
-                    <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
-                        <label for="startDate">Start</label>
-                        <input type="date" id="startDate" style="margin-left: 5px;">
-                    </div>
-                    <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
-                        <label for="endDate">End</label>
-                        <input type="date" id="endDate" style="margin-left: 5px;">
-                    </div>
+                <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
+                    <label for="endDate">End</label>
+                    <input type="date" id="endDate" style="margin-left: 5px;">
                 </div>
             </div>
-            <fieldset style="margin: 5px 0; border: none; padding: 0; display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 5px;">
+            <fieldset style="border: none; padding: 0; display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 5px;">
                 <legend style="float: left; margin-bottom: 5px;">Search type</legend>
                 <div style="display: inline-block;">
                     <input type="radio" id="verbatim" name="searchType" value="verbatim" style="margin-left: 5px;">
@@ -269,9 +335,9 @@ const sidebarHTML = `
                 </span>
             </fieldset>
         </div>
-        <div id="sidebarResults">
-        </div>
-    </td>
+    </div>
+    <div id="hnrelevant-results" style="width: 100%;">
+    </div>
 `;
 
 function updateData(key, value) {
@@ -282,7 +348,7 @@ function updateData(key, value) {
     }
 }
 
-function installSidebar() {
+function installSection() {
     // Submissions and Comments share the same page URL
     // Abort if we are not on a submission page
     if (!document.querySelector('.fatitem .titleline')) {
@@ -309,9 +375,28 @@ function installSidebar() {
     // Make sure all table data elements are aligned to the top
     // (they're centered vertically by default which causes problem when coupled with long sidebar)
     hnBody.querySelectorAll(':scope > tr > td').forEach(td => td.style.verticalAlign = 'top');
-    
-    hnContent.insertAdjacentHTML('beforeend', sidebarHTML);
 
+    if (window.innerWidth < 1200) {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.innerHTML = relevantContent;
+        td.style = 'padding-top: 1rem;';
+        tr.innerHTML = '<td></td><td></td>';
+        tr.appendChild(td);
+        const submissionMetadata = hnContent.querySelector('table.fatitem > tbody');
+        submissionMetadata.appendChild(tr);
+    } else {
+        const td = document.createElement('td');
+        td.style = 'min-width: 280px; width: 25%; vertical-align: baseline; padding-left: 10px;';
+        td.innerHTML = relevantContent;
+        hnContent.appendChild(td);
+    }
+
+    // inject styles
+    const styleElement = document.createElement('style');
+    styleElement.textContent = style;
+    document.head.appendChild(styleElement);
+    
     document.getElementById('queryCustomization').placeholder = searchQuery.rawQuery;
     document.getElementById('queryCustomization').value = searchQuery.rawQuery;
     document.getElementById('numOfResultsDropdown').value = searchQuery.numOfResults;
@@ -369,5 +454,5 @@ function installSidebar() {
 
 window.addEventListener('load', () => {
         'use strict';
-        installSidebar();
+        installSection();
 });
