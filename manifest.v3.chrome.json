@@ -21,6 +21,9 @@
         "./scripts/third-party/browser-polyfill.min.js",
         "./scripts/utils.js",
         "./scripts/main.js"
+      ],
+      "css": [
+        "./css/style.css"
       ]
     }
   ],
