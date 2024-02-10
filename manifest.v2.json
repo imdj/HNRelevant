@@ -27,6 +27,9 @@
       "js": [
         "./scripts/utils.js",
         "./scripts/main.js"
+      ],
+      "css": [
+        "./css/style.css"
       ]
     }
   ],
