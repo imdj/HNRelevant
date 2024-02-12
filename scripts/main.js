@@ -19,6 +19,16 @@ const relevantContent = `
             <input id="queryCustomization" placeholder="${searchQuery.rawQuery}" value="${searchQuery.query}">
             <button type="submit" id="submitCustomization" style="margin-left: 5px;">Submit</button>
         </div>
+        <details>
+            <summary>The results aren't good?</summary>
+            <p>Try the following:
+                <ul>
+                    <li>Omit years and numbers</li>
+                    <li>Remove irrelevant words to avoid noise</li>
+                    <li>Scrap the title and use a custom query instead</li>
+                </ul>
+            </p>
+        </details>
         <div id="hnrelevant-controls">
             <div>
                 <label for="numOfResultsDropdown">Num of results</label>
