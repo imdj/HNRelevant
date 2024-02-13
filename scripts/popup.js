@@ -70,7 +70,7 @@ async function initPopup() {
     }
     else {
         reviewButton.textContent = "Review on Chrome Web Store";
-        reviewButton.href = `https://chromewebstore.google.com/detail/hnrelevant/iajhnkeiioebplnbfkpnlnggkgblmoln`;
+        reviewButton.href = `https://chromewebstore.google.com/detail/hnrelevant-related-storie/iajhnkeiioebplnbfkpnlnggkgblmoln`;
     }
 
     // add event listeners to the input elements

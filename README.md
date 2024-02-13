@@ -17,7 +17,7 @@ A lightweight browser extension that augments your Hacker News experience by sho
 
 ## Installation
 <div>
-<a href="https://chrome.google.com/webstore/detail/hnrelevant/iajhnkeiioebplnbfkpnlnggkgblmoln" target="_blank" style="margin: 0 10px;">
+<a href="https://chromewebstore.google.com/detail/hnrelevant-related-storie/iajhnkeiioebplnbfkpnlnggkgblmoln" target="_blank" style="margin: 0 10px;">
     <img height ="56px" src="https://www.siteimprove.com/globalassets/media/shared/page-specific/integrations/browser-extensions/chrome-webstore.png" alt="HNRelevant on Chrome Web Store" />
 </a>
 <a href="https://addons.mozilla.org/en-US/firefox/addon/hnrelevant/" target="_blank" style="margin: 0 10px;">
@@ -26,7 +26,7 @@ A lightweight browser extension that augments your Hacker News experience by sho
 </div>
 
 Available on:
-- **Chrome web store**: [HNRelevant](https://chrome.google.com/webstore/detail/hnrelevant/iajhnkeiioebplnbfkpnlnggkgblmoln)
+- **Chrome web store**: [HNRelevant](https://chromewebstore.google.com/detail/hnrelevant-related-storie/iajhnkeiioebplnbfkpnlnggkgblmoln)
 - **Firefox (Desktop & Android) add-on**: [HNRelevant](https://addons.mozilla.org/en-US/firefox/addon/hnrelevant/)
 - As a **Userscript**. This option also has the benefit of supporting further browsers:
     1. Make sure to have one of the userscripts extensions installed e.g: Tampermonkey, Violentmonkey, or Greasemonkey.
