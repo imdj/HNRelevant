@@ -8,6 +8,7 @@ A lightweight browser extension that augments your Hacker News experience by sho
 
 ## Features
 - Related submissions ready to be explored
+- Ability to fine-tune the search query and fetch results in place
 - Two modes:
     - Automatic: Enjoy a seamless experience with results generated upon page load
     - Manual: Search only when desired
