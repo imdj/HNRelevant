@@ -33,6 +33,7 @@ A lightweight browser extension that augments your Hacker News experience by sho
 Available on:
 - **Chrome web store**: [HNRelevant](https://chromewebstore.google.com/detail/hnrelevant-related-storie/iajhnkeiioebplnbfkpnlnggkgblmoln)
 - **Firefox (Desktop & Android) add-on**: [HNRelevant](https://addons.mozilla.org/en-US/firefox/addon/hnrelevant/)
+- **Microsoft Edge add-ons**: [HNRelevant](https://microsoftedge.microsoft.com/addons/detail/lfmnjojalnklnkbfcikabochcjgllngc)
 - As a **Userscript**. This option also has the benefit of supporting further browsers:
     1. Make sure to have one of the userscripts extensions installed e.g: Tampermonkey, Violentmonkey, or Greasemonkey.
     2. The userscript file can be found here [HNRelevant.user.js](https://github.com/imdj/HNRelevant/raw/main/HNRelevant.user.js).
