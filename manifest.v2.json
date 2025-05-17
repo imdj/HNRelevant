@@ -25,6 +25,7 @@
         "*://news.ycombinator.com/item*"
       ],
       "js": [
+        "./scripts/nlp.js",
         "./scripts/utils.js",
         "./scripts/main.js"
       ],

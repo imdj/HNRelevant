@@ -19,6 +19,7 @@
       ],
       "js": [
         "./scripts/third-party/browser-polyfill.min.js",
+        "./scripts/nlp.js",
         "./scripts/utils.js",
         "./scripts/main.js"
       ],
