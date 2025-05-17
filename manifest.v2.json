@@ -4,9 +4,9 @@
   "description": "Enhance your Hacker News experience and gain new insights by exploring relevant stories and discussions",
   "version": "1.1.0",
   "icons": {
-    "16": "./assets/images/icon-16.png",
-    "48": "./assets/images/icon-48.png",
-    "128": "./assets/images/icon-128.png"
+    "16": "assets/images/icon-16.png",
+    "48": "assets/images/icon-48.png",
+    "128": "assets/images/icon-128.png"
   },
   "permissions": [
     "storage",
@@ -25,28 +25,28 @@
         "*://news.ycombinator.com/item*"
       ],
       "js": [
-        "./scripts/nlp.js",
-        "./scripts/utils.js",
-        "./scripts/main.js"
+        "scripts/nlp.js",
+        "scripts/utils.js",
+        "scripts/main.js"
       ],
       "css": [
-        "./css/style.css"
+        "css/style.css"
       ]
     }
   ],
   "background": {
     "scripts": [
-      "./scripts/third-party/browser-polyfill.min.js",
-      "./scripts/background/get-results.js"
+      "scripts/third-party/browser-polyfill.min.js",
+      "scripts/background/get-results.js"
     ]
   },
   "browser_action": {
     "default_icon": {
-      "16": "./assets/images/icon-16.png",
-      "48": "./assets/images/icon-48.png",
-      "128": "./assets/images/icon-128.png"
+      "16": "assets/images/icon-16.png",
+      "48": "assets/images/icon-48.png",
+      "128": "assets/images/icon-128.png"
     },
-    "default_popup": "./popup.html",
+    "default_popup": "popup.html",
     "default_title": "HNRelevant"
   }
 }
