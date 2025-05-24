@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "HNRelevant - Related stories on Hacker News",
   "description": "Enhance your Hacker News experience and gain new insights by exploring relevant stories and discussions",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "icons": {
     "16": "./assets/images/icon-16.png",
     "48": "./assets/images/icon-48.png",
