@@ -226,7 +226,6 @@ function getTermFrequency(text) {
 
 function extractKeywords(title, comments) {
     const titleTerms = getTermFrequency(title);
-    console.log('Title Terms:', titleTerms);
     const commentTerms = {};
 
     for (const comment of comments) {
@@ -246,13 +245,9 @@ function extractKeywords(title, comments) {
         scores[term] = freq * 5;
     }
 
-    console.log('title score:', scores);
-
     for (const [term, freq] of Object.entries(commentTerms)) {
         scores[term] = (scores[term] || 0) + freq;
     }
-
-    console.log('Scores:', scores);
 
     // Sort terms by score and take top 5-7 terms
     const keywords = Object.entries(scores)
