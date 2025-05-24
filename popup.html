@@ -11,14 +11,14 @@
 <div class="flex flex-col w-full">
     <div class="ml-2">
         <h3 class="mt-2">Select mode</h3>
-        <div class="flex flex-row items-baseline mb-2">
+        <div class="flex flex-row items-baseline mb-1">
             <input type="radio" id="auto-mode" name="mode" value="auto" aria-describedby="auto-mode-desc" class="top-0.5 relative" checked>
             <div class="ml-2">
                 <label for="auto-mode">Auto-pilot (Default)</label>
                 <p id="auto-mode-desc">Always fetch and show related submissions</p>
             </div>
         </div>
-        <div class="flex flex-row items-baseline mb-2">
+        <div class="flex flex-row items-baseline mb-1">
             <input type="radio" id="manual-mode" name="mode" value="manual" aria-describedby="manual-mode-desc" class="top-0.5 relative">
             <div class="ml-2">
                 <label for="manual-mode">Manual mode</label>
@@ -27,8 +27,8 @@
         </div>
     </div>
     <div class="ml-2">
-        <h3 class="mt-2">Results</h3>
-        <div class="flex flex-row mb-2">
+        <h3 class="mt-2 mb-2">Results</h3>
+        <div class="flex flex-row mb-1">
             <select id="results" name="results" class="mb-auto p-0.5">
                 <option value="5" selected>5</option>
                 <option value="10">10</option>
@@ -40,15 +40,15 @@
         </div>
     </div>
     <div class="ml-2">
-        <h3 class="mt-2">Search type</h3>
-        <div class="flex flex-row items-baseline mb-2">
+        <h3 class="mt-2 mb-2">Search type</h3>
+        <div class="flex flex-row items-baseline mb-1">
             <input type="radio" id="verbatim" name="searchType" value="verbatim">
             <div class="ml-2">
                 <label for="verbatim">Verbatim</label>
                 <p>Get exact matches</p>
             </div>
         </div>
-        <div class="flex flex-row items-baseline mb-2">
+        <div class="flex flex-row items-baseline mb-1">
             <input type="radio" id="similar" name="searchType" value="similar" checked>
             <div class="ml-2">
                 <label for="similar">Similar (Default)</label>
@@ -56,8 +56,8 @@
             </div>
         </div>
         <div class="ml-2">
-            <h3 class="mt-2">Filters</h3>
-            <div class="flex flex-row items-baseline mb-2">
+            <h3 class="mt-2 mb-2">Filters</h3>
+            <div class="flex flex-row items-baseline mb-1">
                 <input type="checkbox" id="hide-low-comments" name="hideLowComments" class="top-0.5 relative">
                 <label for="hide-low-comments" class="ml-2">Ignore posts with few comments</label>
             </div>
