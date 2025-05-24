@@ -36,19 +36,7 @@ const searchType = document.getElementsByName("searchType");
 const hideLowCommentsCheckbox = document.getElementById("hide-low-comments");
 
 async function initPopup() {
-    const preferences = await loadPreferences() || savePreferences({
-        mode: "auto", // "auto" or "manual"
-        rawQuery: "",
-        query: "",
-        type: "similar", // "similar" or "verbatim"
-        numOfResults: 15,
-        hidePostswithLowComments: true,
-        minComments: 3,
-        date: {
-            start: 0,
-            end: new Date().getTime() / 1000
-        }
-    });
+    const preferences = await loadPreferences();
 
     // set the input elements to the saved values
     for (const radioButton of modeRadioButtons) {

@@ -1,16 +1,4 @@
-let searchQuery = {
-    mode: "auto", // "auto" or "manual"
-    rawQuery: "",
-    query: "",
-    type: "similar", // "similar" or "verbatim"
-    numOfResults: 15,
-    hidePostswithLowComments: true,
-    minComments: 3,
-    date: {
-        start: 0,
-        end: Math.floor(new Date().getTime() / 1000)
-    }
-};
+let searchQuery = getDefaultPreferences();
 
 let itemId = (new URLSearchParams(document.location.search)).get("id");
 
@@ -96,7 +84,7 @@ async function installSection() {
 
     // Load preferences from storage
     // if not present save the default preferences to storage and use them
-    searchQuery = await loadPreferences() || savePreferences(searchQuery);
+    searchQuery = await loadPreferences();
 
     const hnBody = document.querySelector('#hnmain > tbody');
     let NavbarIndex = 0;

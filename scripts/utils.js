@@ -1,6 +1,48 @@
+const DEFAULT_PREFERENCES = {
+    mode: "auto", // "auto" or "manual"
+    rawQuery: "",
+    query: "",
+    type: "similar", // "similar" or "verbatim"
+    numOfResults: 15,
+    hidePostswithLowComments: true,
+    minComments: 3,
+    date: {
+        start: 0,
+        end: Math.floor(new Date().getTime() / 1000)
+    }
+};
+
+function getDefaultPreferences() {
+    return {
+        ...DEFAULT_PREFERENCES,
+        date: {
+            ...DEFAULT_PREFERENCES.date,
+            end: Math.floor(new Date().getTime() / 1000)
+        }
+    };
+}
+
 async function loadPreferences() {
-    const preferences = await browser.storage.sync.get('hnrelevant');
-    return preferences.hnrelevant;
+    const stored = await browser.storage.sync.get('hnrelevant');
+    const storedPreferences = stored.hnrelevant;
+
+    if (!storedPreferences) {
+        return getDefaultPreferences();
+    }
+
+    const mergedPreferences = {
+        ...getDefaultPreferences(),
+        ...storedPreferences,
+        date: {
+            ...getDefaultPreferences().date,
+            ...(storedPreferences.date || {})
+        }
+    };
+
+    // Save the merged preferences back to ensure new fields are persisted
+    savePreferences(mergedPreferences);
+    
+    return mergedPreferences;
 }
 
 function savePreferences(preferences) {
