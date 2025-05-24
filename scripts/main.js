@@ -4,6 +4,8 @@ let searchQuery = {
     query: "",
     type: "similar", // "similar" or "verbatim"
     numOfResults: 15,
+    hidePostswithLowComments: true,
+    minComments: 3,
     date: {
         start: 0,
         end: Math.floor(new Date().getTime() / 1000)

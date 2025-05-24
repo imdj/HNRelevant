@@ -33,6 +33,7 @@ function requestPermission() {
 const modeRadioButtons = document.getElementsByName("mode");
 const resultsDropdown = document.getElementById("results");
 const searchType = document.getElementsByName("searchType");
+const hideLowCommentsCheckbox = document.getElementById("hide-low-comments");
 
 async function initPopup() {
     const preferences = await loadPreferences() || savePreferences({
@@ -41,6 +42,8 @@ async function initPopup() {
         query: "",
         type: "similar", // "similar" or "verbatim"
         numOfResults: 15,
+        hidePostswithLowComments: true,
+        minComments: 3,
         date: {
             start: 0,
             end: new Date().getTime() / 1000
@@ -61,6 +64,7 @@ async function initPopup() {
         }
     }
     resultsDropdown.value = preferences.numOfResults;
+    hideLowCommentsCheckbox.checked = preferences.hidePostswithLowComments;
 
     // Set review button
     const reviewButton = document.getElementById("review-btn");
@@ -85,6 +89,11 @@ async function initPopup() {
         savePreferences(preferences);
         }
     );
+
+    hideLowCommentsCheckbox.addEventListener("change", (event) => {
+        preferences.hidePostswithLowComments = event.target.checked;
+        savePreferences(preferences);
+    });
 
     for (const radioButton of searchType) {
         radioButton.addEventListener("change", (event) => {

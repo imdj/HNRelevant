@@ -20,6 +20,8 @@ let searchQuery = {
     query: "",
     type: "similar", // "similar" or "verbatim"
     numOfResults: 15,
+    hidePostswithLowComments: true,
+    minComments: 3,
     date: {
         start: 0,
         end: Math.floor(new Date().getTime() / 1000)
@@ -290,6 +292,7 @@ async function searchHackerNews() {
         + `&hitsPerPage=${searchQuery.numOfResults}`
         + `&filters=NOT objectID:` + itemId // exclude current submission
         + `&numericFilters=created_at_i>${searchQuery.date.start},created_at_i<${searchQuery.date.end}` // filter by date
+        + (searchQuery.hidePostswithLowComments ? `,num_comments>=${searchQuery.minComments}` : ``) // filter by minimum comments if enabled
         ;
 
     const response = await fetch(url).then(response => response.json());

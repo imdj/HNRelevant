@@ -10,6 +10,7 @@ async function searchHackerNews(submissionID, searchObject) {
         + `&hitsPerPage=${searchObject.numOfResults}`
         + `&filters=NOT objectID:` + submissionID // exclude current submission
         + `&numericFilters=created_at_i>${searchObject.date.start},created_at_i<${searchObject.date.end}` // filter by date
+        + (searchObject.hidePostswithLowComments ? `,num_comments>=${searchObject.minComments}` : ``) // filter by minimum comments if enabled
         ;
 
     const response = await fetch(url).then(response => response.json());
