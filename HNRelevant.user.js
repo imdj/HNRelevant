@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         HNRelevant
-// @version      1.3.1
+// @version      1.3.2
 // @description  Enhance your Hacker News experience and gain new insights by exploring relevant stories and discussions
 // @author       imdj
 // @match        *://news.ycombinator.com/item*
