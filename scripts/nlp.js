@@ -1,4 +1,4 @@
-const HNWords = ['Ask HN', 'Tell HN', 'Show HN', 'Launch HN'];
+const HNWords = ['ask hn', 'tell hn', 'show hn', 'launch hn'];
 
 const stopWords = [
     'about',
