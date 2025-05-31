@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         HNRelevant
-// @version      1.3.2
-// @description  Enhance your Hacker News experience and gain new insights by exploring relevant stories and discussions
+// @version      1.4.0
+// @description  Adds a "Related Submissions" section to Hacker News
 // @author       imdj
 // @match        *://news.ycombinator.com/item*
 // @connect      *://hn.algolia.com/*
