@@ -418,12 +418,12 @@ function optimizeSearchQuery() {
     searchQuery.query = stripYearFromTitle(searchQuery.rawQuery);
 
     const title = document.querySelector('.fatitem .titleline > a').textContent;
-    const comments = document.querySelectorAll('.comment > .commtext');
+    const topLevelComments = document.querySelectorAll('td.ind[indent="0"] + td + td .commtext');    
     let keywords = [];
 
     // Use comments only showing results for the current discussion
     if (searchQuery.rawQuery === title) {
-        keywords = textAnalyzer.extractKeywords(searchQuery.query, comments);
+        keywords = textAnalyzer.extractKeywords(searchQuery.query, topLevelComments);
         searchQuery.query = keywords.join(' ');
     }
 
