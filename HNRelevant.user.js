@@ -279,17 +279,9 @@ function optimizeSearchQuery() {
     // Use comments only showing results for the current discussion
     if (searchQuery.rawQuery === title) {
         keywords = extractKeywords(searchQuery.query, comments);
-    }
-    else {
-        // Do not use comments if the user submitted a custom query
-        const titleTerms = getTermFrequency(searchQuery.query);
-        keywords = Object.entries(titleTerms)
-        .sort(([, a], [, b]) => b - a)
-        .slice(0, 5)
-        .map(([term]) => term);
+        searchQuery.query = keywords.join(' ');
     }
 
-    searchQuery.query = keywords.join(' ');
     return searchQuery.query;
 }
 
