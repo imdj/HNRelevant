@@ -51,6 +51,7 @@ function savePreferences(preferences) {
 }
 
 function optimizeSearchQuery() {
+    const textAnalyzer = new TextAnalyzer();
     searchQuery.query = stripYearFromTitle(searchQuery.rawQuery);
 
     const title = document.querySelector('.fatitem .titleline > a').textContent;
@@ -59,7 +60,7 @@ function optimizeSearchQuery() {
 
     // Use comments only showing results for the current discussion
     if (searchQuery.rawQuery === title) {
-        keywords = extractKeywords(searchQuery.query, comments);
+        keywords = textAnalyzer.extractKeywords(searchQuery.query, comments);
         searchQuery.query = keywords.join(' ');
     }
 
