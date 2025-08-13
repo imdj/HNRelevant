@@ -1,3 +1,35 @@
+
+<div align="right">
+  <details>
+    <summary >🌐 Language</summary>
+    <div>
+      <div align="center">
+        <a href="https://openaitx.github.io/view.html?user=imdj&project=HNRelevant&lang=en">English</a>
+        | <a href="https://openaitx.github.io/view.html?user=imdj&project=HNRelevant&lang=zh-CN">简体中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=imdj&project=HNRelevant&lang=zh-TW">繁體中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=imdj&project=HNRelevant&lang=ja">日本語</a>
+        | <a href="https://openaitx.github.io/view.html?user=imdj&project=HNRelevant&lang=ko">한국어</a>
+        | <a href="https://openaitx.github.io/view.html?user=imdj&project=HNRelevant&lang=hi">हिन्दी</a>
+        | <a href="https://openaitx.github.io/view.html?user=imdj&project=HNRelevant&lang=th">ไทย</a>
+        | <a href="https://openaitx.github.io/view.html?user=imdj&project=HNRelevant&lang=fr">Français</a>
+        | <a href="https://openaitx.github.io/view.html?user=imdj&project=HNRelevant&lang=de">Deutsch</a>
+        | <a href="https://openaitx.github.io/view.html?user=imdj&project=HNRelevant&lang=es">Español</a>
+        | <a href="https://openaitx.github.io/view.html?user=imdj&project=HNRelevant&lang=it">Italiano</a>
+        | <a href="https://openaitx.github.io/view.html?user=imdj&project=HNRelevant&lang=ru">Русский</a>
+        | <a href="https://openaitx.github.io/view.html?user=imdj&project=HNRelevant&lang=pt">Português</a>
+        | <a href="https://openaitx.github.io/view.html?user=imdj&project=HNRelevant&lang=nl">Nederlands</a>
+        | <a href="https://openaitx.github.io/view.html?user=imdj&project=HNRelevant&lang=pl">Polski</a>
+        | <a href="https://openaitx.github.io/view.html?user=imdj&project=HNRelevant&lang=ar">العربية</a>
+        | <a href="https://openaitx.github.io/view.html?user=imdj&project=HNRelevant&lang=fa">فارسی</a>
+        | <a href="https://openaitx.github.io/view.html?user=imdj&project=HNRelevant&lang=tr">Türkçe</a>
+        | <a href="https://openaitx.github.io/view.html?user=imdj&project=HNRelevant&lang=vi">Tiếng Việt</a>
+        | <a href="https://openaitx.github.io/view.html?user=imdj&project=HNRelevant&lang=id">Bahasa Indonesia</a>
+        | <a href="https://openaitx.github.io/view.html?user=imdj&project=HNRelevant&lang=as">অসমীয়া</
+      </div>
+    </div>
+  </details>
+</div>
+
 <div><img src="./preview.png" style="min-width: 100%" alt="preview of the relevant submissions section on hacker news"/></div>
 
 ![Chrome Web Store](https://img.shields.io/chrome-web-store/v/iajhnkeiioebplnbfkpnlnggkgblmoln?logo=googlechrome&logoColor=000000&labelColor=F3F3F3&color=4285F4)
