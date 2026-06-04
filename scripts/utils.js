@@ -52,15 +52,17 @@ function savePreferences(preferences) {
 
 function optimizeSearchQuery() {
     const textAnalyzer = new TextAnalyzer();
-    searchQuery.query = stripYearFromTitle(searchQuery.rawQuery);
+    searchQuery.query = textAnalyzer.normalizeTitle(searchQuery.rawQuery);
 
-    const title = document.querySelector('.fatitem .titleline > a').textContent;
-    const topLevelComments = document.querySelectorAll('td.ind[indent="0"] + td + td .commtext');    
+    const titleLink = document.querySelector('.fatitem .titleline > a');
+    const title = titleLink.textContent;
+    const titleUrl = titleLink.href;
+    const topLevelComments = document.querySelectorAll('td.ind[indent="0"] + td + td .commtext');
     let keywords = [];
 
     // Use comments only showing results for the current discussion
     if (searchQuery.rawQuery === title) {
-        keywords = textAnalyzer.extractKeywords(searchQuery.query, topLevelComments);
+        keywords = textAnalyzer.extractKeywords(searchQuery.query, topLevelComments, titleUrl);
         searchQuery.query = keywords.join(' ');
     }
 
@@ -90,11 +92,6 @@ function timestampToRelativeTime(timestamp) {
     }
 
     return rtf.format(-Math.round(diff / 1000), 'second');
-}
-
-// i.e. "Title (2021)" -> "Title"
-function stripYearFromTitle(title) {
-    return title.replace(/\s\(\d{4}\)$/, '');
 }
 
 // Render dom element for a search result

@@ -40,7 +40,7 @@ Available on:
     3. Load the script into the extension of your choice.
 
 ## How it works
-It's based on [HN algolia search API](https://hn.algolia.com/api) and uses the submission title as its initial query
+It is based on the [HN Algolia search API](https://hn.algolia.com/api) and builds a short query by selecting keywords from the title and top level comments.
 
 ## License
 Released under the [MIT License](http://www.opensource.org/licenses/MIT). See [LICENSE](LICENSE) file for details.

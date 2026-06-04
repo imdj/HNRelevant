@@ -13,26 +13,61 @@
 // @grant        none
 // @inject-into  content
 // ==/UserScript==
-
-let searchQuery = {
-    mode: "auto", // "auto" or "manual"
-    rawQuery: "",
-    query: "",
-    type: "similar", // "similar" or "verbatim"
-    numOfResults: 15,
-    hidePostswithLowComments: true,
-    minComments: 3,
-    date: {
-        start: 0,
-        end: Math.floor(new Date().getTime() / 1000)
-    }
-};
-
-let itemId = (new URLSearchParams(document.location.search)).get("id");
-
 class TextAnalyzer {
     constructor() {
-        this.HNWords = ['ask hn', 'tell hn', 'show hn', 'launch hn'];
+        this.titleNoiseWords = new Set([
+            'acquired',
+            'acquires',
+            'acquisition',
+            'announce',
+            'announced',
+            'announces',
+            'build',
+            'built',
+            'buy',
+            'buys',
+            'buying',
+            'come',
+            'comes',
+            'coming',
+            'do',
+            'does',
+            'doing',
+            'get',
+            'gets',
+            'getting',
+            'go',
+            'goes',
+            'going',
+            'join',
+            'joined',
+            'joining',
+            'launch',
+            'launched',
+            'launches',
+            'make',
+            'made',
+            'makes',
+            'moving',
+            'move',
+            'moves',
+            'new',
+            'raise',
+            'raised',
+            'raises',
+            'release',
+            'released',
+            'releases',
+            'say',
+            'says',
+            'said',
+            'start',
+            'started',
+            'starts',
+            'use',
+            'used',
+            'uses'
+        ]);
 
         this.stopWords = [
             'about',
@@ -47,6 +82,7 @@ class TextAnalyzer {
             'are',
             'as',
             'at',
+            'ask',
             'be',
             'because',
             'been',
@@ -79,6 +115,7 @@ class TextAnalyzer {
             'him',
             'himself',
             'his',
+            'hn',
             'how',
             'if',
             'in',
@@ -86,6 +123,7 @@ class TextAnalyzer {
             'is',
             'it',
             'just',
+            'launch',
             'like',
             'make',
             'many',
@@ -114,12 +152,14 @@ class TextAnalyzer {
             'said',
             'same',
             'should',
+            'show',
             'since',
             'so',
             'some',
             'still',
             'such',
             'take',
+            'tell',
             'than',
             'that',
             'the',
@@ -158,7 +198,7 @@ class TextAnalyzer {
             'your',
             'a',
             'i'
-        ]
+        ];
 
         this.contractions = {
             "ain't": "is not",
@@ -205,8 +245,53 @@ class TextAnalyzer {
         };
     }
 
-    cleanText(text) {
+    normalizeTitle(title = '') {
+        return title
+            .replace(/^(ask|show|tell|launch)\s+hn\s*[:\-]?\s*/i, '')
+            .replace(/\s*\(\d{4}\)$/, '')
+            .trim();
+    }
+
+    extractDomainKeyword(url = '') {
+        if (!url) return '';
+
+        let hostname = '';
+        try {
+            hostname = new URL(url).hostname.toLowerCase();
+        } catch {
+            return '';
+        }
+
+        if (!hostname || hostname.includes('ycombinator.com')) {
+            return '';
+        }
+
+        const ignoreLabels = new Set([
+            'www', 'm', 'amp', 'blog', 'news', 'dev', 'docs', 'support',
+            'research', 'careers', 'about', 'help', 'status', 'app', 'beta'
+        ]);
+        const ignoreTlds = new Set([
+            'com', 'org', 'net', 'io', 'co', 'uk', 'us', 'dev', 'ai', 'edu', 'gov', 'app'
+        ]);
+
+        const labels = hostname.split('.').filter(Boolean);
+        const meaningfulLabels = labels.filter(label =>
+            !ignoreLabels.has(label) &&
+            !ignoreTlds.has(label) &&
+            label.length >= 3 &&
+            !/^\d+$/.test(label)
+        );
+
+        if (!meaningfulLabels.length) {
+            return '';
+        }
+
+        return meaningfulLabels[0].replace(/[^a-z0-9]/g, '');
+    }
+
+    cleanText(text = '') {
         return text
+            .toString()
             .toLowerCase()
             .replace(/https?:\/\/[^\s]+/g, ' ')
             .replace(/www\.[^\s]+/g, ' ')
@@ -217,195 +302,189 @@ class TextAnalyzer {
             .replace(/\s+/g, ' ')
             .trim()
             .split(' ')
-            .filter(token =>
-                token.length >= 2 &&
-                !this.HNWords.includes(token) &&
-                !this.stopWords.includes(token)
-            )
+            .filter(token => token.length >= 2 && !this.stopWords.includes(token))
             .join(' ');
     }
 
-    // Find the top n-grams in the comments
-    // group related ones using LCS or character similarity
-    findTopNGrams(comments, n = 2, topCount = 10, similarityThreshold = 0.9, title = '') {
+    tokenize(text = '') {
+        return this.cleanText(text).split(' ').filter(token => token.length > 0);
+    }
+
+    isEntityLike(token = '') {
+        return /[A-Z]/.test(token) || /[0-9]/.test(token) || /[a-z][A-Z]/.test(token);
+    }
+
+    isMeaningfulTitleToken(token = '') {
+        const lowerToken = token.toLowerCase();
+        return !!lowerToken &&
+            lowerToken.length >= 3 &&
+            !this.stopWords.includes(lowerToken) &&
+            !this.titleNoiseWords.has(lowerToken);
+    }
+
+    extractTitleKeywords(title = '') {
+        const normalizedTitle = this.normalizeTitle(title);
+        const rawTokens = normalizedTitle.match(/[A-Za-z0-9][A-Za-z0-9'_-]*/g) || [];
+        const scoredTokens = [];
+        const meaningfulTokens = [];
+
+        rawTokens.forEach((token, index) => {
+            const cleanToken = token.replace(/[^A-Za-z0-9]/g, '');
+            const lowerToken = cleanToken.toLowerCase();
+
+            if (!cleanToken) return;
+            if (this.stopWords.includes(lowerToken)) return;
+            if (this.titleNoiseWords.has(lowerToken)) return;
+            if (lowerToken.length < 3 && !/^[A-Z0-9]{2,}$/.test(cleanToken)) return;
+
+            meaningfulTokens.push({ token: lowerToken, index });
+
+            let score = 0;
+
+            if (this.isEntityLike(cleanToken)) {
+                score += 4;
+            }
+
+            if (cleanToken.length >= 8) {
+                score += 2;
+            } else if (cleanToken.length >= 5) {
+                score += 1;
+            }
+
+            if (index > 0) {
+                score += 0.5;
+            }
+
+            if (/(ing|ed|es)$/.test(lowerToken)) {
+                score -= 2;
+            }
+
+            scoredTokens.push({ token: lowerToken, score, index });
+        });
+
+        if (!scoredTokens.length) {
+            return this.tokenize(normalizedTitle).slice(0, 2);
+        }
+
+        const selectedTokens = [];
+
+        const entityTokens = scoredTokens
+            .filter(entry => this.isEntityLike(entry.token))
+            .sort((left, right) => left.index - right.index)
+            .map(entry => entry.token);
+
+        for (const token of entityTokens) {
+            if (!selectedTokens.includes(token)) selectedTokens.push(token);
+            if (selectedTokens.length >= 2) break;
+        }
+
+        for (let index = meaningfulTokens.length - 1; index >= 0; index--) {
+            const token = meaningfulTokens[index].token;
+            if (!selectedTokens.includes(token)) {
+                selectedTokens.push(token);
+                break;
+            }
+        }
+
+        const remainingTokens = scoredTokens
+            .sort((left, right) => right.score - left.score || left.index - right.index)
+            .map(entry => entry.token);
+
+        for (const token of remainingTokens) {
+            if (selectedTokens.includes(token)) continue;
+            selectedTokens.push(token);
+            if (selectedTokens.length >= 3) break;
+        }
+
+        return selectedTokens.slice(0, 3);
+    }
+
+    shouldUseCommentFallback(titleTerms) {
+        if (!titleTerms || !titleTerms.length) return true;
+
+        if (titleTerms.length === 1) {
+            const token = titleTerms[0];
+            return token.length < 5 || this.titleNoiseWords.has(token);
+        }
+
+        return titleTerms.every(token => this.titleNoiseWords.has(token));
+    }
+
+    shouldIncludeDomainKeyword(titleTerms, domainKeyword) {
+        if (!domainKeyword) return false;
+        if (!titleTerms || !titleTerms.length) return true;
+
+        const hasEntityLikeTitle = titleTerms.some(token => this.isEntityLike(token));
+
+        if (titleTerms.length <= 2) return true;
+        if (!hasEntityLikeTitle && titleTerms.length <= 3) return true;
+
+        return titleTerms.every(token => this.titleNoiseWords.has(token));
+    }
+
+    findTopNGrams(comments, n = 2, topCount = 8, title = '') {
         const ngramFreq = {};
+        const titleTerms = new Set(this.tokenize(this.normalizeTitle(title)));
 
-        // Extract title keywords for boosting
-        const titleKeywords = title ? this.cleanText(title).split(' ').filter(token => token.length > 0) : [];
+        for (const comment of comments || []) {
+            const commentText = comment?.textContent || comment?.text || '';
+            const tokens = this.tokenize(commentText);
 
-        // Generate n-grams from all comments
-        for (const comment of comments) {
-            const cleanedText = this.cleanText(comment.textContent);
-            const tokens = cleanedText.split(' ').filter(token => token.length > 0);
+            for (let index = 0; index <= tokens.length - n; index++) {
+                const ngramTokens = tokens.slice(index, index + n);
+                if (!ngramTokens.length) continue;
 
-            // Generate n-grams
-            for (let i = 0; i <= tokens.length - n; i++) {
-                const ngram = tokens.slice(i, i + n).join(' ');
-                if (ngram.trim()) {
-                    let baseFreq = (ngramFreq[ngram] || 0) + 1;
+                if (ngramTokens.every(token => titleTerms.has(token))) continue;
 
-                    // Boost frequency if ngram is similar to title keywords
-                    let titleBoost = 0;
-                    for (const keyword of titleKeywords) {
-                        const similarity = this.calculateStringSimilarity(ngram, keyword);
-                        if (similarity >= 0.6) {
-                            titleBoost += similarity * 3;
-                        }
-                    }
-
-                    ngramFreq[ngram] = baseFreq + titleBoost;
-                }
+                const ngram = ngramTokens.join(' ');
+                ngramFreq[ngram] = (ngramFreq[ngram] || 0) + 1;
             }
         }
 
-        // Sort n-grams by frequency
-        const sortedNgrams = Object.entries(ngramFreq)
-            .sort(([, a], [, b]) => b - a)
-            .slice(0, topCount * 4);
-
-        // Group similar n-grams
-        const groups = [];
-        const used = new Set();
-
-        // Group n-grams by similarity
-        for (const [ngram, freq] of sortedNgrams) {
-            if (used.has(ngram)) continue;
-
-            const group = {
-                representative: ngram,
-                frequency: freq,
-                similar: [ngram]
-            };
-            used.add(ngram);
-
-            // Find similar n-grams
-            for (const [otherNgram, otherFreq] of sortedNgrams) {
-                if (used.has(otherNgram) || ngram === otherNgram) continue;
-
-                if (this.calculateStringSimilarity(ngram, otherNgram) >= similarityThreshold) {
-                    group.similar.push(otherNgram);
-                    group.frequency += otherFreq;
-                    used.add(otherNgram);
-                }
-            }
-
-            groups.push(group);
-        }
-
-        // Sort groups by combined frequency and return top results
-        return groups
-            .sort((a, b) => b.frequency - a.frequency)
-            .slice(0, topCount);
+        return Object.entries(ngramFreq)
+            .sort(([, left], [, right]) => right - left)
+            .slice(0, topCount)
+            .map(([representative, frequency]) => ({ representative, frequency }));
     }
 
-    calculateStringSimilarity(str1, str2) {
-        const norm1 = str1.replace(/\s+/g, '').toLowerCase();
-        const norm2 = str2.replace(/\s+/g, '').toLowerCase();
-
-        if (norm1 === norm2) return 1.0;
-
-        // Check for substring containment
-        if (norm1.includes(norm2) || norm2.includes(norm1)) {
-            const shorterLen = Math.min(norm1.length, norm2.length);
-            const longerLen = Math.max(norm1.length, norm2.length);
-            return shorterLen / longerLen;
-        }
-
-        // Check for word-level similarity
-        const words1 = str1.toLowerCase().split(/\s+/);
-        const words2 = str2.toLowerCase().split(/\s+/);
-        const wordSet1 = new Set(words1);
-        const wordSet2 = new Set(words2);
-        const wordIntersection = new Set([...wordSet1].filter(x => wordSet2.has(x)));
-        const wordUnion = new Set([...wordSet1, ...wordSet2]);
-        const wordJaccard = wordIntersection.size / wordUnion.size;
-
-        if (wordJaccard > 0.3) {
-            return wordJaccard;
-        }
-
-        // Character-based similarity using LCS
-        const minLength = Math.min(norm1.length, norm2.length);
-        const maxLength = Math.max(norm1.length, norm2.length);
-
-        if (minLength / maxLength < 0.6) {
-            return 0;
-        }
-
-        const lcs = this.longestCommonSubsequence(norm1, norm2);
-        const lcsSimilarity = (2.0 * lcs) / (norm1.length + norm2.length);
-
-        return lcsSimilarity > 0.7 ? lcsSimilarity : 0;
-    }
-
-    longestCommonSubsequence(str1, str2) {
-        const m = str1.length;
-        const n = str2.length;
-        const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
-
-        for (let i = 1; i <= m; i++) {
-            for (let j = 1; j <= n; j++) {
-                if (str1[i - 1] === str2[j - 1]) {
-                    dp[i][j] = dp[i - 1][j - 1] + 1;
-                } else {
-                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
-                }
-            }
-        }
-
-        return dp[m][n];
-    }
-
-    extractKeywords(title, comments) {
-        const titleTerms = this.cleanText(title).split(' ');
-
+    extractKeywords(title, comments, url = '') {
+        const titleTerms = this.extractTitleKeywords(title);
+        const titleTermSet = new Set(titleTerms);
         const usedTerms = new Set();
         const keywords = [];
 
-        // Add all title keywords
+        const domainKeyword = this.extractDomainKeyword(url);
+
         for (const titleTerm of titleTerms) {
-            if (!usedTerms.has(titleTerm.toLowerCase())) {
+            if (!usedTerms.has(titleTerm)) {
                 keywords.push(titleTerm);
-                usedTerms.add(titleTerm.toLowerCase());
+                usedTerms.add(titleTerm);
             }
         }
 
-        if (keywords.length <= 5) {
-            const topNGrams = this.findTopNGrams(comments, 2, 10, 0.9, title);
+        if (this.shouldIncludeDomainKeyword(titleTerms, domainKeyword) && !usedTerms.has(domainKeyword)) {
+            keywords.push(domainKeyword);
+            usedTerms.add(domainKeyword);
+        }
 
-            // Add one diverse n-gram
-            let addedDiverseNgram = false;
-            for (const group of topNGrams.slice(0, 3)) {
-                if (keywords.length >= 8 || addedDiverseNgram) break;
+        if (keywords.length < 2 && this.shouldUseCommentFallback(titleTerms)) {
+            const topNGrams = this.findTopNGrams(comments, 2, 5, title);
+
+            for (const group of topNGrams) {
+                if (group.frequency < 2 || keywords.length >= 6) break;
 
                 const rep = group.representative;
-                const repWords = rep.split(' ');
+                const repWords = rep.split(' ').filter(Boolean);
 
-                if (usedTerms.has(rep.toLowerCase())) continue;
+                if (!repWords.length || usedTerms.has(rep)) continue;
+                if (repWords.some(word => usedTerms.has(word))) continue;
+                if (repWords.some(word => word.length < 3)) continue;
+                if (repWords.every(word => titleTermSet.has(word))) continue;
 
-                // Check if similar to title terms
-                let isSimilarToTitle = false;
-                for (const titleTerm of titleTerms) {
-                    const similarity = this.calculateStringSimilarity(rep, titleTerm);
-                    const containsTitle = rep.toLowerCase().includes(titleTerm.toLowerCase()) ||
-                        repWords.some(word => word.toLowerCase() === titleTerm.toLowerCase());
-
-                    if (similarity > 0.9 || containsTitle) { // Use consistent threshold
-                        isSimilarToTitle = true;
-                        break;
-                    }
-                }
-
-                if (!isSimilarToTitle) {
-                    const hasUsedWords = repWords.some(word => usedTerms.has(word.toLowerCase()));
-
-                    if (!hasUsedWords) {
-                        keywords.push(rep);
-                        usedTerms.add(rep.toLowerCase());
-                        repWords.forEach(word => usedTerms.add(word.toLowerCase()));
-                        addedDiverseNgram = true;
-                    }
-                }
+                keywords.push(rep);
+                usedTerms.add(rep);
+                repWords.forEach(word => usedTerms.add(word));
+                break;
             }
         }
 
@@ -415,15 +494,16 @@ class TextAnalyzer {
 
 function optimizeSearchQuery() {
     const textAnalyzer = new TextAnalyzer();
-    searchQuery.query = stripYearFromTitle(searchQuery.rawQuery);
+    searchQuery.query = textAnalyzer.normalizeTitle(searchQuery.rawQuery);
 
-    const title = document.querySelector('.fatitem .titleline > a').textContent;
-    const topLevelComments = document.querySelectorAll('td.ind[indent="0"] + td + td .commtext');    
+    const titleLink = document.querySelector('.fatitem .titleline > a');
+    const title = titleLink.textContent;
+    const titleUrl = titleLink.href;
+    const topLevelComments = document.querySelectorAll('td.ind[indent="0"] + td + td .commtext');
     let keywords = [];
 
-    // Use comments only showing results for the current discussion
     if (searchQuery.rawQuery === title) {
-        keywords = textAnalyzer.extractKeywords(searchQuery.query, topLevelComments);
+        keywords = textAnalyzer.extractKeywords(searchQuery.query, topLevelComments, titleUrl);
         searchQuery.query = keywords.join(' ');
     }
 
@@ -468,11 +548,6 @@ function timestampToRelativeTime(timestamp) {
     }
 
     return rtf.format(-Math.round(diff / 1000), 'second');
-}
-
-// i.e. "Title (2021)" -> "Title"
-function stripYearFromTitle(title) {
-    return title.replace(/\s\(\d{4}\)$/, '');
 }
 
 // Render dom element for a search result
