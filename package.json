@@ -1,0 +1,15 @@
+{
+  "name": "hnrelevant",
+  "private": true,
+  "version": "1.4.0",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "build:patch": "node build.mjs --patch",
+    "build:minor": "node build.mjs --minor",
+    "build:major": "node build.mjs --major"
+  },
+  "devDependencies": {
+    "archiver": "^7.0.1"
+  }
+}

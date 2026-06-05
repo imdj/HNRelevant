@@ -42,5 +42,15 @@ Available on:
 ## How it works
 It is based on the [HN Algolia search API](https://hn.algolia.com/api) and builds a short query by selecting keywords from the title and top level comments.
 
+## Build
+The generated artifacts now come from a single build entry point instead of being maintained by hand.
+
+- Install the Node dependency once with `npm install`
+- Run `node build.mjs` to regenerate the manifests, the userscript, and the publishable ZIP packages
+- Use `node build.mjs --minor` or `node build.mjs --major` to bump the version and rebuild everything in one step
+- Use `node build.mjs --userscript-only` when you only want to refresh [HNRelevant.user.js](HNRelevant.user.js)
+
+The shared manifest source lives in [manifest.base.json](manifest.base.json). Generated manifests and extension ZIPs are written under `output/`.
+
 ## License
 Released under the [MIT License](http://www.opensource.org/licenses/MIT). See [LICENSE](LICENSE) file for details.

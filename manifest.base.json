@@ -1,0 +1,25 @@
+{
+  "name": "HNRelevant - Related stories on Hacker News",
+  "description": "Enhance your Hacker News experience and gain new insights by exploring relevant stories and discussions",
+  "icons": {
+    "16": "assets/images/icon-16.png",
+    "48": "assets/images/icon-48.png",
+    "128": "assets/images/icon-128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://news.ycombinator.com/item*"
+      ],
+      "js": [
+        "scripts/third-party/browser-polyfill.min.js",
+        "scripts/nlp.js",
+        "scripts/utils.js",
+        "scripts/main.js"
+      ],
+      "css": [
+        "css/style.css"
+      ]
+    }
+  ]
+}
