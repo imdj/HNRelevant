@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         HNRelevant
-// @version      1.4.0
+// @version      1.5.0
 // @description  Adds a "Related Submissions" section to Hacker News
 // @author       imdj
 // @match        *://news.ycombinator.com/item*
@@ -13,6 +13,67 @@
 // @grant        none
 // @inject-into  content
 // ==/UserScript==
+
+
+
+const __HNRelevantStorageKey = 'hnrelevant';
+const __HNRelevantStyles = "#hnrelevant-controls-container, #hnrelevant-controls {\n    display: flex;\n    gap: 10px\n}\n\n#hnrelevant-controls-container {\n    flex-direction: column;\n}\n\n#hnrelevant-controls {\n    flex-direction: row;\n    flex-wrap: wrap;\n    align-items: center;\n}\n\n#query-customization-container {\n    display: flex;\n    flex-direction: row;\n    align-items: center;\n    margin: 5px 0;\n    padding-right: 10px;\n}\n\n#queryCustomization {\n    flex-grow: 1;\n}\n\n#hnrelevant-results-list {\n    list-style: none;\n    padding: 0;\n    width: 100%;\n    display: flex;\n    flex-direction: column;\n}\n\n#hnrelevant-results-list .result {\n    padding: 5px 0;\n    min-width: 280px;\n}\n\n@media screen and (max-width: 1200px) {\n    #hnrelevant-results {\n        display: grid;\n    }\n\n    #hnrelevant-results-list {\n        flex-direction: row;\n        gap: 10px;\n        overflow-x: auto;\n    }\n\n    #hnrelevant-results-list .result {\n        display: flex;\n        flex-direction: column;\n        justify-content: space-between;\n        border: 1px solid #d3d3d3;\n        border-radius: 5px;\n        padding: 5px;\n    }\n}";
+
+function __HNRelevantInjectStyles() {
+    if (document.getElementById('hnrelevant-style')) {
+        return;
+    }
+
+    const styleElement = document.createElement('style');
+    styleElement.id = 'hnrelevant-style';
+    styleElement.textContent = __HNRelevantStyles;
+  (document.head || document.documentElement).appendChild(styleElement);
+}
+
+function __HNRelevantSearchUrl(submissionID, searchObject) {
+  return 'https://hn.algolia.com/api/v1/search'
+    + (searchObject.type === 'verbatim'
+      ? '?query=' + encodeURIComponent(searchObject.rawQuery)
+      : '?similarQuery=' + encodeURIComponent(searchObject.query))
+    + '&tags=story'
+    + '&hitsPerPage=' + searchObject.numOfResults
+    + '&filters=NOT objectID:' + submissionID
+    + '&numericFilters=created_at_i>' + searchObject.date.start + ',created_at_i<' + searchObject.date.end
+    + (searchObject.hidePostswithLowComments ? ',num_comments>=' + searchObject.minComments : '');
+}
+
+function __HNRelevantFetchSearch(submissionID, searchObject) {
+    return fetch(__HNRelevantSearchUrl(submissionID, searchObject)).then(response => response.json());
+}
+
+const browser = {
+    storage: {
+        sync: {
+            async get(key) {
+                const raw = localStorage.getItem(__HNRelevantStorageKey);
+                const stored = raw ? JSON.parse(raw) : null;
+                return { [key]: stored };
+            },
+            async set(value) {
+                localStorage.setItem(__HNRelevantStorageKey, JSON.stringify(value.hnrelevant));
+            }
+        }
+    },
+    runtime: {
+        async sendMessage(message) {
+            return __HNRelevantFetchSearch(message.id, message.object);
+        },
+        onMessage: {
+            addListener() {
+                return undefined;
+            }
+        }
+    }
+};
+
+__HNRelevantInjectStyles();
+
+
 class TextAnalyzer {
     constructor() {
         this.titleNoiseWords = new Set([
@@ -302,7 +363,10 @@ class TextAnalyzer {
             .replace(/\s+/g, ' ')
             .trim()
             .split(' ')
-            .filter(token => token.length >= 2 && !this.stopWords.includes(token))
+            .filter(token =>
+                token.length >= 2 &&
+                !this.stopWords.includes(token)
+            )
             .join(' ');
     }
 
@@ -355,7 +419,13 @@ class TextAnalyzer {
                 score += 0.5;
             }
 
-            if (/(ing|ed|es)$/.test(lowerToken)) {
+            if (index === rawTokens.length - 1) {
+                score += 6;
+            } else if (index >= rawTokens.length - 2) {
+                score += 2;
+            }
+
+            if (/(ing|ed|es|ize|ify|ate)$/.test(lowerToken) && index !== rawTokens.length - 1) {
                 score -= 2;
             }
 
@@ -434,7 +504,9 @@ class TextAnalyzer {
                 const ngramTokens = tokens.slice(index, index + n);
                 if (!ngramTokens.length) continue;
 
-                if (ngramTokens.every(token => titleTerms.has(token))) continue;
+                if (ngramTokens.every(token => titleTerms.has(token))) {
+                    continue;
+                }
 
                 const ngram = ngramTokens.join(' ');
                 ngramFreq[ngram] = (ngramFreq[ngram] || 0) + 1;
@@ -471,7 +543,9 @@ class TextAnalyzer {
             const topNGrams = this.findTopNGrams(comments, 2, 5, title);
 
             for (const group of topNGrams) {
-                if (group.frequency < 2 || keywords.length >= 6) break;
+                if (group.frequency < 2 || keywords.length >= 6) {
+                    break;
+                }
 
                 const rep = group.representative;
                 const repWords = rep.split(' ').filter(Boolean);
@@ -492,6 +566,58 @@ class TextAnalyzer {
     }
 }
 
+const DEFAULT_PREFERENCES = {
+    mode: "auto", // "auto" or "manual"
+    rawQuery: "",
+    query: "",
+    type: "similar", // "similar" or "verbatim"
+    numOfResults: 15,
+    hidePostswithLowComments: true,
+    minComments: 3,
+    date: {
+        start: 0,
+        end: Math.floor(new Date().getTime() / 1000)
+    }
+};
+
+function getDefaultPreferences() {
+    return {
+        ...DEFAULT_PREFERENCES,
+        date: {
+            ...DEFAULT_PREFERENCES.date,
+            end: Math.floor(new Date().getTime() / 1000)
+        }
+    };
+}
+
+async function loadPreferences() {
+    const stored = await browser.storage.sync.get('hnrelevant');
+    const storedPreferences = stored.hnrelevant;
+
+    if (!storedPreferences) {
+        return getDefaultPreferences();
+    }
+
+    const mergedPreferences = {
+        ...getDefaultPreferences(),
+        ...storedPreferences,
+        date: {
+            ...getDefaultPreferences().date,
+            ...(storedPreferences.date || {})
+        }
+    };
+
+    // Save the merged preferences back to ensure new fields are persisted
+    savePreferences(mergedPreferences);
+    
+    return mergedPreferences;
+}
+
+function savePreferences(preferences) {
+    browser.storage.sync.set({ hnrelevant: preferences });
+    return preferences;
+}
+
 function optimizeSearchQuery() {
     const textAnalyzer = new TextAnalyzer();
     searchQuery.query = textAnalyzer.normalizeTitle(searchQuery.rawQuery);
@@ -502,27 +628,13 @@ function optimizeSearchQuery() {
     const topLevelComments = document.querySelectorAll('td.ind[indent="0"] + td + td .commtext');
     let keywords = [];
 
+    // Use comments only showing results for the current discussion
     if (searchQuery.rawQuery === title) {
         keywords = textAnalyzer.extractKeywords(searchQuery.query, topLevelComments, titleUrl);
         searchQuery.query = keywords.join(' ');
     }
 
     return searchQuery.query;
-}
-
-async function searchHackerNews() {
-    searchQuery.query = optimizeSearchQuery();
-    const url = `https://hn.algolia.com/api/v1/search`
-        + (searchQuery.type === 'verbatim' ? `?query=${encodeURIComponent(searchQuery.rawQuery)}` : `?similarQuery=${encodeURIComponent(searchQuery.query)}`)
-        + `&tags=story`
-        + `&hitsPerPage=${searchQuery.numOfResults}`
-        + `&filters=NOT objectID:` + itemId // exclude current submission
-        + `&numericFilters=created_at_i>${searchQuery.date.start},created_at_i<${searchQuery.date.end}` // filter by date
-        + (searchQuery.hidePostswithLowComments ? `,num_comments>=${searchQuery.minComments}` : ``) // filter by minimum comments if enabled
-        ;
-
-    const response = await fetch(url).then(response => response.json());
-    return response;
 }
 
 // Get relative time from timestamp
@@ -643,9 +755,10 @@ function updateDateRange() {
 
 // Update sidebar content
 function updateResults() {
-    document.getElementById('hnrelevant-results').innerHTML = '';
+    document.getElementById('hnrelevant-results').replaceChildren();
+    searchQuery.query = optimizeSearchQuery();
 
-    searchHackerNews().then((result) => {
+    browser.runtime.sendMessage({id: itemId, object: searchQuery}).then((result) => {
         const list = document.createElement('ul');
         list.id = 'hnrelevant-results-list';
 
@@ -667,133 +780,188 @@ function updateResults() {
     });
 }
 
-const style = `
-#hnrelevant-controls-container, #hnrelevant-controls {
-    display: flex;
-    gap: 10px
+
+let searchQuery = getDefaultPreferences();
+
+let itemId = (new URLSearchParams(document.location.search)).get("id");
+
+function appendOption(select, value, label, selected = false) {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = label;
+    option.selected = selected;
+    select.appendChild(option);
 }
 
-#hnrelevant-controls-container {
-    flex-direction: column;
-}
+function appendRelevantSection(container) {
+    const header = document.createElement('h2');
+    header.id = 'hnrelevant-header';
+    header.textContent = 'Relevant Submissions';
+    container.appendChild(header);
 
-#hnrelevant-controls {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-}
+    const controlsContainer = document.createElement('div');
+    controlsContainer.id = 'hnrelevant-controls-container';
 
-#query-customization-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin: 5px 0;
-    padding-right: 10px;
-}
+    const queryContainer = document.createElement('div');
+    queryContainer.id = 'query-customization-container';
 
-#queryCustomization {
-    flex-grow: 1;
-}
+    const queryInput = document.createElement('input');
+    queryInput.id = 'queryCustomization';
+    queryContainer.appendChild(queryInput);
 
-#hnrelevant-results-list {
-    list-style: none;
-    padding: 0;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-}
+    const submitButton = document.createElement('button');
+    submitButton.type = 'submit';
+    submitButton.id = 'submitCustomization';
+    submitButton.style.marginLeft = '5px';
+    submitButton.textContent = 'Submit';
+    queryContainer.appendChild(submitButton);
+    controlsContainer.appendChild(queryContainer);
 
-#hnrelevant-results-list .result {
-    padding: 5px 0;
-    min-width: 280px;
-}
+    const helpDetails = document.createElement('details');
+    const helpSummary = document.createElement('summary');
+    helpSummary.textContent = "The results aren't good?";
+    helpDetails.appendChild(helpSummary);
 
-@media screen and (max-width: 1200px) {
-    #hnrelevant-results {
-        display: grid;
+    const helpParagraph = document.createElement('p');
+    helpParagraph.textContent = 'Try the following:';
+    const helpList = document.createElement('ul');
+    for (const item of ['Omit years and numbers', 'Remove irrelevant words to avoid noise', 'Scrap the title and use a custom query instead']) {
+        const listItem = document.createElement('li');
+        listItem.textContent = item;
+        helpList.appendChild(listItem);
     }
+    helpParagraph.appendChild(helpList);
+    helpDetails.appendChild(helpParagraph);
+    controlsContainer.appendChild(helpDetails);
 
-    #hnrelevant-results-list {
-        flex-direction: row;
-        gap: 10px;
-        overflow-x: auto;
-    }
+    const controls = document.createElement('div');
+    controls.id = 'hnrelevant-controls';
 
-    #hnrelevant-results-list .result {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        border: 1px solid #d3d3d3;
-        border-radius: 5px;
-        padding: 5px;
-    }
+    const resultsControl = document.createElement('div');
+    const resultsLabel = document.createElement('label');
+    resultsLabel.htmlFor = 'numOfResultsDropdown';
+    resultsLabel.textContent = 'Num of results';
+    const resultsSelect = document.createElement('select');
+    resultsSelect.style.marginLeft = '5px';
+    resultsSelect.id = 'numOfResultsDropdown';
+    appendOption(resultsSelect, '5', '5');
+    appendOption(resultsSelect, '10', '10');
+    appendOption(resultsSelect, '15', '15', true);
+    appendOption(resultsSelect, '20', '20');
+    appendOption(resultsSelect, '30', '30');
+    resultsControl.appendChild(resultsLabel);
+    resultsControl.appendChild(resultsSelect);
+    controls.appendChild(resultsControl);
+
+    const dateControl = document.createElement('div');
+    const dateLabel = document.createElement('label');
+    dateLabel.htmlFor = 'dateRangeDropdown';
+    dateLabel.textContent = 'Date';
+    const dateSelect = document.createElement('select');
+    dateSelect.style.marginLeft = '5px';
+    dateSelect.id = 'dateRangeDropdown';
+    appendOption(dateSelect, 'Past week', 'Past week');
+    appendOption(dateSelect, 'Past month', 'Past month');
+    appendOption(dateSelect, 'Past year', 'Past year');
+    appendOption(dateSelect, 'All time', 'All time', true);
+    appendOption(dateSelect, 'Custom', 'Custom');
+    dateControl.appendChild(dateLabel);
+    dateControl.appendChild(dateSelect);
+    controls.appendChild(dateControl);
+
+    const dateRangeInputContainer = document.createElement('div');
+    dateRangeInputContainer.id = 'dateRangeInputContainer';
+    dateRangeInputContainer.style.display = 'none';
+
+    const startDateRow = document.createElement('div');
+    startDateRow.style.display = 'flex';
+    startDateRow.style.flexDirection = 'row';
+    startDateRow.style.alignItems = 'center';
+    startDateRow.style.gap = '5px';
+    const startDateLabel = document.createElement('label');
+    startDateLabel.htmlFor = 'startDate';
+    startDateLabel.textContent = 'Start';
+    const startDateInput = document.createElement('input');
+    startDateInput.type = 'date';
+    startDateInput.id = 'startDate';
+    startDateInput.style.marginLeft = '5px';
+    startDateRow.appendChild(startDateLabel);
+    startDateRow.appendChild(startDateInput);
+
+    const endDateRow = document.createElement('div');
+    endDateRow.style.display = 'flex';
+    endDateRow.style.flexDirection = 'row';
+    endDateRow.style.alignItems = 'center';
+    endDateRow.style.gap = '5px';
+    const endDateLabel = document.createElement('label');
+    endDateLabel.htmlFor = 'endDate';
+    endDateLabel.textContent = 'End';
+    const endDateInput = document.createElement('input');
+    endDateInput.type = 'date';
+    endDateInput.id = 'endDate';
+    endDateInput.style.marginLeft = '5px';
+    endDateRow.appendChild(endDateLabel);
+    endDateRow.appendChild(endDateInput);
+
+    dateRangeInputContainer.appendChild(startDateRow);
+    dateRangeInputContainer.appendChild(endDateRow);
+    controls.appendChild(dateRangeInputContainer);
+
+    const searchTypeFieldset = document.createElement('fieldset');
+    searchTypeFieldset.style.border = 'none';
+    searchTypeFieldset.style.padding = '0';
+    searchTypeFieldset.style.display = 'flex';
+    searchTypeFieldset.style.flexDirection = 'row';
+    searchTypeFieldset.style.alignItems = 'center';
+    searchTypeFieldset.style.justifyContent = 'flex-start';
+    searchTypeFieldset.style.gap = '5px';
+
+    const searchTypeLegend = document.createElement('legend');
+    searchTypeLegend.style.float = 'left';
+    searchTypeLegend.style.marginBottom = '5px';
+    searchTypeLegend.textContent = 'Search type';
+    searchTypeFieldset.appendChild(searchTypeLegend);
+
+    const verbatimControl = document.createElement('div');
+    verbatimControl.style.display = 'inline-block';
+    const verbatimInput = document.createElement('input');
+    verbatimInput.type = 'radio';
+    verbatimInput.id = 'verbatim';
+    verbatimInput.name = 'searchType';
+    verbatimInput.value = 'verbatim';
+    verbatimInput.style.marginLeft = '5px';
+    const verbatimLabel = document.createElement('label');
+    verbatimLabel.htmlFor = 'verbatim';
+    verbatimLabel.textContent = 'Verbatim';
+    verbatimControl.appendChild(verbatimInput);
+    verbatimControl.appendChild(verbatimLabel);
+    searchTypeFieldset.appendChild(verbatimControl);
+
+    const similarControl = document.createElement('div');
+    similarControl.style.display = 'inline-block';
+    const similarInput = document.createElement('input');
+    similarInput.type = 'radio';
+    similarInput.id = 'similar';
+    similarInput.name = 'searchType';
+    similarInput.value = 'similar';
+    similarInput.checked = true;
+    similarInput.style.marginLeft = '5px';
+    const similarLabel = document.createElement('label');
+    similarLabel.htmlFor = 'similar';
+    similarLabel.textContent = 'Similar';
+    similarControl.appendChild(similarInput);
+    similarControl.appendChild(similarLabel);
+    searchTypeFieldset.appendChild(similarControl);
+    controls.appendChild(searchTypeFieldset);
+
+    controlsContainer.appendChild(controls);
+    container.appendChild(controlsContainer);
+
+    const resultsContainer = document.createElement('div');
+    resultsContainer.id = 'hnrelevant-results';
+    resultsContainer.style.width = '100%';
+    container.appendChild(resultsContainer);
 }
-`;
-
-const relevantContent = `
-    <h2 id="hnrelevant-header">Relevant Submissions</h2>
-    <div id="hnrelevant-controls-container">
-        <div id="query-customization-container">
-            <input id="queryCustomization" placeholder="${searchQuery.rawQuery}" value="${searchQuery.query}">
-            <button type="submit" id="submitCustomization" style="margin-left: 5px;">Submit</button>
-        </div>
-        <details>
-            <summary>The results aren't good?</summary>
-            <p>Try the following:
-                <ul>
-                    <li>Omit years and numbers</li>
-                    <li>Remove irrelevant words to avoid noise</li>
-                    <li>Scrap the title and use a custom query instead</li>
-                </ul>
-            </p>
-        </details>
-        <div id="hnrelevant-controls">
-            <div>
-                <label for="numOfResultsDropdown">Num of results</label>
-                <select style="margin-left: 5px;" id="numOfResultsDropdown">
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="15" selected>15</option>
-                    <option value="20">20</option>
-                    <option value="30">30</option>
-                </select>
-            </div>
-            <div>
-                <label for="dateRangeDropdown">Date</label>
-                <select style="margin-left: 5px;" id="dateRangeDropdown">
-                    <option value="Past week">Past week</option>
-                    <option value="Past month">Past month</option>
-                    <option value="Past year">Past year</option>
-                    <option value="All time" selected>All time</option>
-                    <option value="Custom">Custom</option>
-                </select>
-            </div>
-            <div id="dateRangeInputContainer" style="display: none;">
-                <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
-                    <label for="startDate">Start</label>
-                    <input type="date" id="startDate" style="margin-left: 5px;">
-                </div>
-                <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
-                    <label for="endDate">End</label>
-                    <input type="date" id="endDate" style="margin-left: 5px;">
-                </div>
-            </div>
-            <fieldset style="border: none; padding: 0; display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 5px;">
-                <legend style="float: left; margin-bottom: 5px;">Search type</legend>
-                <div style="display: inline-block;">
-                    <input type="radio" id="verbatim" name="searchType" value="verbatim" style="margin-left: 5px;">
-                    <label for="verbatim">Verbatim</label>
-                </span>
-                <div style="display: inline-block;">
-                    <input type="radio" id="similar" name="searchType" value="similar" checked style="margin-left: 5px;">
-                    <label for="similar">Similar</label>
-                </span>
-            </fieldset>
-        </div>
-    </div>
-    <div id="hnrelevant-results" style="width: 100%;">
-    </div>
-`;
 
 function updateData(key, value) {
     searchQuery[key] = value;
@@ -803,12 +971,16 @@ function updateData(key, value) {
     }
 }
 
-function installSection() {
+async function installSection() {
     // Submissions and Comments share the same page URL
     // Abort if we are not on a submission page
     if (!document.querySelector('.fatitem .titleline')) {
         return;
     }
+
+    // Load preferences from storage
+    // if not present save the default preferences to storage and use them
+    searchQuery = await loadPreferences();
 
     const hnBody = document.querySelector('#hnmain > tbody');
     let NavbarIndex = 0;
@@ -833,25 +1005,24 @@ function installSection() {
 
     if (window.innerWidth < 1200) {
         const tr = document.createElement('tr');
+        tr.appendChild(document.createElement('td'));
+        tr.appendChild(document.createElement('td'));
         const td = document.createElement('td');
-        td.innerHTML = relevantContent;
-        td.style = 'padding-top: 1rem;';
-        tr.innerHTML = '<td></td><td></td>';
+        td.style.paddingTop = '1rem';
+        appendRelevantSection(td);
         tr.appendChild(td);
         const submissionMetadata = hnContent.querySelector('table.fatitem > tbody');
         submissionMetadata.appendChild(tr);
     } else {
         const td = document.createElement('td');
-        td.style = 'min-width: 280px; width: 25%; vertical-align: baseline; padding-left: 10px;';
-        td.innerHTML = relevantContent;
+        td.style.minWidth = '280px';
+        td.style.width = '25%';
+        td.style.verticalAlign = 'baseline';
+        td.style.paddingLeft = '10px';
+        appendRelevantSection(td);
         hnContent.appendChild(td);
     }
 
-    // inject styles
-    const styleElement = document.createElement('style');
-    styleElement.textContent = style;
-    document.head.appendChild(styleElement);
-    
     document.getElementById('queryCustomization').placeholder = searchQuery.rawQuery;
     document.getElementById('queryCustomization').value = searchQuery.rawQuery;
     document.getElementById('numOfResultsDropdown').value = searchQuery.numOfResults;
@@ -907,7 +1078,8 @@ function installSection() {
     });
 }
 
-window.addEventListener('load', () => {
-        'use strict';
-        installSection();
-});
+if (document.readyState !== 'complete') {
+    window.addEventListener('load', installSection);
+} else {
+    installSection();
+}
