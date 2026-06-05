@@ -389,7 +389,7 @@ async function main() {
     }
   }
 
-  console.log(`Built HNRelevant v${version}`);
+  console.log(`Release v${version}`);
 }
 
 main().catch((error) => {
