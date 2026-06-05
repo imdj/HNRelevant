@@ -14,7 +14,7 @@ A browser extension that adds a "Related" section to Hacker News. Don't miss out
 - Choose how it works:
     - Automatic: Results load when you open a page
     - Manual: Fetch on demand
-- Available on Firefox for Android™<span><img height="16" src="https://source.android.com/static/docs/setup/images/Android_symbol_green_RGB.svg"/></span>
+- Available on Firefox for Android™<span><img height="14" src="https://upload.wikimedia.org/wikipedia/commons/3/31/Android_robot_head.svg"/></span>
 - Ability to change defaults to your preference in the extension's popup menu
 
 ## Installation
