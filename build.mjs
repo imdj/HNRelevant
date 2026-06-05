@@ -10,6 +10,10 @@ const manifestBasePath = path.join(rootDir, 'manifest.base.json');
 const packageJsonPath = path.join(rootDir, 'package.json');
 const packageLockPath = path.join(rootDir, 'package-lock.json');
 
+const FIREFOX_DATA_COLLECTION = {
+  required: ['searchTerms']
+};
+
 const TARGETS = {
   mv2: {
     manifestPath: path.join(outputDir, 'manifest.v2.json'),
@@ -32,7 +36,8 @@ const TARGETS = {
     applications: {
       gecko: {
         id: 'hnrelevant@extensions.imdj.dev',
-        strict_min_version: '79.0'
+        strict_min_version: '79.0',
+        data_collection_permissions: FIREFOX_DATA_COLLECTION
       }
     }
   },
@@ -73,10 +78,11 @@ const TARGETS = {
     browser_specific_settings: {
       gecko: {
         id: 'hnrelevant@extensions.imdj.dev',
-        strict_min_version: '109.0'
+        strict_min_version: '140.0',
+        data_collection_permissions: FIREFOX_DATA_COLLECTION
       },
       gecko_android: {
-        strict_min_version: '120.0'
+        strict_min_version: '142.0'
       }
     }
   }

@@ -2,70 +2,183 @@ let searchQuery = getDefaultPreferences();
 
 let itemId = (new URLSearchParams(document.location.search)).get("id");
 
-const relevantContent = `
-    <h2 id="hnrelevant-header">Relevant Submissions</h2>
-    <div id="hnrelevant-controls-container">
-        <div id="query-customization-container">
-            <input id="queryCustomization" placeholder="${searchQuery.rawQuery}" value="${searchQuery.query}">
-            <button type="submit" id="submitCustomization" style="margin-left: 5px;">Submit</button>
-        </div>
-        <details>
-            <summary>The results aren't good?</summary>
-            <p>Try the following:
-                <ul>
-                    <li>Omit years and numbers</li>
-                    <li>Remove irrelevant words to avoid noise</li>
-                    <li>Scrap the title and use a custom query instead</li>
-                </ul>
-            </p>
-        </details>
-        <div id="hnrelevant-controls">
-            <div>
-                <label for="numOfResultsDropdown">Num of results</label>
-                <select style="margin-left: 5px;" id="numOfResultsDropdown">
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="15" selected>15</option>
-                    <option value="20">20</option>
-                    <option value="30">30</option>
-                </select>
-            </div>
-            <div>
-                <label for="dateRangeDropdown">Date</label>
-                <select style="margin-left: 5px;" id="dateRangeDropdown">
-                    <option value="Past week">Past week</option>
-                    <option value="Past month">Past month</option>
-                    <option value="Past year">Past year</option>
-                    <option value="All time" selected>All time</option>
-                    <option value="Custom">Custom</option>
-                </select>
-            </div>
-            <div id="dateRangeInputContainer" style="display: none;">
-                <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
-                    <label for="startDate">Start</label>
-                    <input type="date" id="startDate" style="margin-left: 5px;">
-                </div>
-                <div style="display: flex; flex-direction: row; align-items: center; gap: 5px;">
-                    <label for="endDate">End</label>
-                    <input type="date" id="endDate" style="margin-left: 5px;">
-                </div>
-            </div>
-            <fieldset style="border: none; padding: 0; display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 5px;">
-                <legend style="float: left; margin-bottom: 5px;">Search type</legend>
-                <div style="display: inline-block;">
-                    <input type="radio" id="verbatim" name="searchType" value="verbatim" style="margin-left: 5px;">
-                    <label for="verbatim">Verbatim</label>
-                </span>
-                <div style="display: inline-block;">
-                    <input type="radio" id="similar" name="searchType" value="similar" checked style="margin-left: 5px;">
-                    <label for="similar">Similar</label>
-                </span>
-            </fieldset>
-        </div>
-    </div>
-    <div id="hnrelevant-results" style="width: 100%;">
-    </div>
-`;
+function appendOption(select, value, label, selected = false) {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = label;
+    option.selected = selected;
+    select.appendChild(option);
+}
+
+function appendRelevantSection(container) {
+    const header = document.createElement('h2');
+    header.id = 'hnrelevant-header';
+    header.textContent = 'Relevant Submissions';
+    container.appendChild(header);
+
+    const controlsContainer = document.createElement('div');
+    controlsContainer.id = 'hnrelevant-controls-container';
+
+    const queryContainer = document.createElement('div');
+    queryContainer.id = 'query-customization-container';
+
+    const queryInput = document.createElement('input');
+    queryInput.id = 'queryCustomization';
+    queryContainer.appendChild(queryInput);
+
+    const submitButton = document.createElement('button');
+    submitButton.type = 'submit';
+    submitButton.id = 'submitCustomization';
+    submitButton.style.marginLeft = '5px';
+    submitButton.textContent = 'Submit';
+    queryContainer.appendChild(submitButton);
+    controlsContainer.appendChild(queryContainer);
+
+    const helpDetails = document.createElement('details');
+    const helpSummary = document.createElement('summary');
+    helpSummary.textContent = "The results aren't good?";
+    helpDetails.appendChild(helpSummary);
+
+    const helpParagraph = document.createElement('p');
+    helpParagraph.textContent = 'Try the following:';
+    const helpList = document.createElement('ul');
+    for (const item of ['Omit years and numbers', 'Remove irrelevant words to avoid noise', 'Scrap the title and use a custom query instead']) {
+        const listItem = document.createElement('li');
+        listItem.textContent = item;
+        helpList.appendChild(listItem);
+    }
+    helpParagraph.appendChild(helpList);
+    helpDetails.appendChild(helpParagraph);
+    controlsContainer.appendChild(helpDetails);
+
+    const controls = document.createElement('div');
+    controls.id = 'hnrelevant-controls';
+
+    const resultsControl = document.createElement('div');
+    const resultsLabel = document.createElement('label');
+    resultsLabel.htmlFor = 'numOfResultsDropdown';
+    resultsLabel.textContent = 'Num of results';
+    const resultsSelect = document.createElement('select');
+    resultsSelect.style.marginLeft = '5px';
+    resultsSelect.id = 'numOfResultsDropdown';
+    appendOption(resultsSelect, '5', '5');
+    appendOption(resultsSelect, '10', '10');
+    appendOption(resultsSelect, '15', '15', true);
+    appendOption(resultsSelect, '20', '20');
+    appendOption(resultsSelect, '30', '30');
+    resultsControl.appendChild(resultsLabel);
+    resultsControl.appendChild(resultsSelect);
+    controls.appendChild(resultsControl);
+
+    const dateControl = document.createElement('div');
+    const dateLabel = document.createElement('label');
+    dateLabel.htmlFor = 'dateRangeDropdown';
+    dateLabel.textContent = 'Date';
+    const dateSelect = document.createElement('select');
+    dateSelect.style.marginLeft = '5px';
+    dateSelect.id = 'dateRangeDropdown';
+    appendOption(dateSelect, 'Past week', 'Past week');
+    appendOption(dateSelect, 'Past month', 'Past month');
+    appendOption(dateSelect, 'Past year', 'Past year');
+    appendOption(dateSelect, 'All time', 'All time', true);
+    appendOption(dateSelect, 'Custom', 'Custom');
+    dateControl.appendChild(dateLabel);
+    dateControl.appendChild(dateSelect);
+    controls.appendChild(dateControl);
+
+    const dateRangeInputContainer = document.createElement('div');
+    dateRangeInputContainer.id = 'dateRangeInputContainer';
+    dateRangeInputContainer.style.display = 'none';
+
+    const startDateRow = document.createElement('div');
+    startDateRow.style.display = 'flex';
+    startDateRow.style.flexDirection = 'row';
+    startDateRow.style.alignItems = 'center';
+    startDateRow.style.gap = '5px';
+    const startDateLabel = document.createElement('label');
+    startDateLabel.htmlFor = 'startDate';
+    startDateLabel.textContent = 'Start';
+    const startDateInput = document.createElement('input');
+    startDateInput.type = 'date';
+    startDateInput.id = 'startDate';
+    startDateInput.style.marginLeft = '5px';
+    startDateRow.appendChild(startDateLabel);
+    startDateRow.appendChild(startDateInput);
+
+    const endDateRow = document.createElement('div');
+    endDateRow.style.display = 'flex';
+    endDateRow.style.flexDirection = 'row';
+    endDateRow.style.alignItems = 'center';
+    endDateRow.style.gap = '5px';
+    const endDateLabel = document.createElement('label');
+    endDateLabel.htmlFor = 'endDate';
+    endDateLabel.textContent = 'End';
+    const endDateInput = document.createElement('input');
+    endDateInput.type = 'date';
+    endDateInput.id = 'endDate';
+    endDateInput.style.marginLeft = '5px';
+    endDateRow.appendChild(endDateLabel);
+    endDateRow.appendChild(endDateInput);
+
+    dateRangeInputContainer.appendChild(startDateRow);
+    dateRangeInputContainer.appendChild(endDateRow);
+    controls.appendChild(dateRangeInputContainer);
+
+    const searchTypeFieldset = document.createElement('fieldset');
+    searchTypeFieldset.style.border = 'none';
+    searchTypeFieldset.style.padding = '0';
+    searchTypeFieldset.style.display = 'flex';
+    searchTypeFieldset.style.flexDirection = 'row';
+    searchTypeFieldset.style.alignItems = 'center';
+    searchTypeFieldset.style.justifyContent = 'flex-start';
+    searchTypeFieldset.style.gap = '5px';
+
+    const searchTypeLegend = document.createElement('legend');
+    searchTypeLegend.style.float = 'left';
+    searchTypeLegend.style.marginBottom = '5px';
+    searchTypeLegend.textContent = 'Search type';
+    searchTypeFieldset.appendChild(searchTypeLegend);
+
+    const verbatimControl = document.createElement('div');
+    verbatimControl.style.display = 'inline-block';
+    const verbatimInput = document.createElement('input');
+    verbatimInput.type = 'radio';
+    verbatimInput.id = 'verbatim';
+    verbatimInput.name = 'searchType';
+    verbatimInput.value = 'verbatim';
+    verbatimInput.style.marginLeft = '5px';
+    const verbatimLabel = document.createElement('label');
+    verbatimLabel.htmlFor = 'verbatim';
+    verbatimLabel.textContent = 'Verbatim';
+    verbatimControl.appendChild(verbatimInput);
+    verbatimControl.appendChild(verbatimLabel);
+    searchTypeFieldset.appendChild(verbatimControl);
+
+    const similarControl = document.createElement('div');
+    similarControl.style.display = 'inline-block';
+    const similarInput = document.createElement('input');
+    similarInput.type = 'radio';
+    similarInput.id = 'similar';
+    similarInput.name = 'searchType';
+    similarInput.value = 'similar';
+    similarInput.checked = true;
+    similarInput.style.marginLeft = '5px';
+    const similarLabel = document.createElement('label');
+    similarLabel.htmlFor = 'similar';
+    similarLabel.textContent = 'Similar';
+    similarControl.appendChild(similarInput);
+    similarControl.appendChild(similarLabel);
+    searchTypeFieldset.appendChild(similarControl);
+    controls.appendChild(searchTypeFieldset);
+
+    controlsContainer.appendChild(controls);
+    container.appendChild(controlsContainer);
+
+    const resultsContainer = document.createElement('div');
+    resultsContainer.id = 'hnrelevant-results';
+    resultsContainer.style.width = '100%';
+    container.appendChild(resultsContainer);
+}
 
 function updateData(key, value) {
     searchQuery[key] = value;
@@ -109,17 +222,21 @@ async function installSection() {
 
     if (window.innerWidth < 1200) {
         const tr = document.createElement('tr');
+        tr.appendChild(document.createElement('td'));
+        tr.appendChild(document.createElement('td'));
         const td = document.createElement('td');
-        td.innerHTML = relevantContent;
-        td.style = 'padding-top: 1rem;';
-        tr.innerHTML = '<td></td><td></td>';
+        td.style.paddingTop = '1rem';
+        appendRelevantSection(td);
         tr.appendChild(td);
         const submissionMetadata = hnContent.querySelector('table.fatitem > tbody');
         submissionMetadata.appendChild(tr);
     } else {
         const td = document.createElement('td');
-        td.style = 'min-width: 280px; width: 25%; vertical-align: baseline; padding-left: 10px;';
-        td.innerHTML = relevantContent;
+        td.style.minWidth = '280px';
+        td.style.width = '25%';
+        td.style.verticalAlign = 'baseline';
+        td.style.paddingLeft = '10px';
+        appendRelevantSection(td);
         hnContent.appendChild(td);
     }
 

@@ -1,34 +1,3 @@
-const permissionsToRequest = {
-    origins: ["*://news.ycombinator.com/*", "*://hn.algolia.com/api/*"]
-}
-
-function requestPermission() {
-    browser.permissions.request(permissionsToRequest);
-    window.close();
-}
-
-(async () => {
-    const permissionStatus = await browser.permissions.contains(permissionsToRequest);
- 
-    if (!permissionStatus) {
-        document.body.innerHTML = "";
-
-        const description = document.createElement("p");
-        description.textContent = "HNRelevant needs some permissions to access Hacker News and Algolia API to fetch results.";
-        description.style = "padding: 0.5em; margin-bottom: 1em;";
-        document.body.appendChild(description);
-
-        const grantPermissionButton = document.createElement("button");
-        grantPermissionButton.textContent = "Grant Permission";
-        grantPermissionButton.classList = "btn main-btn";
-        grantPermissionButton.style = "font-size: 1.5em;";
-        grantPermissionButton.addEventListener("click", requestPermission);
-
-        document.body.appendChild(grantPermissionButton);
-    }
-})();
-
-
 // get references to the input elements
 const modeRadioButtons = document.getElementsByName("mode");
 const resultsDropdown = document.getElementById("results");

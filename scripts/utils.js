@@ -187,7 +187,7 @@ function updateDateRange() {
 
 // Update sidebar content
 function updateResults() {
-    document.getElementById('hnrelevant-results').innerHTML = '';
+    document.getElementById('hnrelevant-results').replaceChildren();
     searchQuery.query = optimizeSearchQuery();
 
     browser.runtime.sendMessage({id: itemId, object: searchQuery}).then((result) => {
