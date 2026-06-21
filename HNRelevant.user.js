@@ -38,8 +38,7 @@ function __HNRelevantSearchUrl(submissionID, searchObject) {
     + '&tags=story'
     + '&hitsPerPage=' + searchObject.numOfResults
     + '&filters=NOT objectID:' + submissionID
-    + '&numericFilters=created_at_i>' + searchObject.date.start + ',created_at_i<' + searchObject.date.end
-    + (searchObject.hidePostswithLowComments ? ',num_comments>=' + searchObject.minComments : '');
+    + '&numericFilters=created_at_i>' + searchObject.date.start + ',created_at_i<' + searchObject.date.end;
 }
 
 function __HNRelevantFetchSearch(submissionID, searchObject) {
@@ -572,8 +571,6 @@ const DEFAULT_PREFERENCES = {
     query: "",
     type: "similar", // "similar" or "verbatim"
     numOfResults: 15,
-    hidePostswithLowComments: true,
-    minComments: 3,
     date: {
         start: 0,
         end: Math.floor(new Date().getTime() / 1000)
