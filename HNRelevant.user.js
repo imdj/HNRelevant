@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         HNRelevant
-// @version      1.5.0
+// @version      1.6.0
 // @description  Adds a "Related Submissions" section to Hacker News
 // @author       imdj
 // @match        *://news.ycombinator.com/item*
